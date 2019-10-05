@@ -89,7 +89,7 @@ test('getLoadDefinition - simplist', (assert) => {
                 {
                     search_string: { value: "Rob" },
                     country: {
-                        value: "",
+                        value: "Argentina",
                         options: [
                             { display: "Argentina (3)", value: "Argentina" },
                             { display: "Austria (2)", value: "Austria" },
