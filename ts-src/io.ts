@@ -1,6 +1,6 @@
 import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
 import { URL } from "./types";
-import { EsqlateArgument } from 'esqlate-lib';
+import { EsqlateArgument, EsqlateParameter } from 'esqlate-lib';
 
 export function getQuery(): EsqlateArgument[] {
 
@@ -11,9 +11,11 @@ export function getQuery(): EsqlateArgument[] {
         }
         return o;
     }
+
     return paramsToR(
         new URLSearchParams(window.location.hash.replace(/.*\?/, ''))
     );
+
 }
 
 export function getApiRoot(): URL {

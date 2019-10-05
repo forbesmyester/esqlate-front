@@ -23,6 +23,17 @@ interface ControlStore {
     [k: string]: InputControlStore | SelectControlStore;
 }
 
+export function addControlStoreToEsqlateArguments(cs: ControlStore, esqArg: EsqlateArgument[]): EsqlateArgument[] {
+    const alreadyHave: Set<String> = new Set(esqArg.map((ea) => ea.name));
+    return Object.getOwnPropertyNames(cs).reduce(
+        (acc: EsqlateArgument[], k: string) => {
+            if (alreadyHave.has(k)) { return acc; }
+            return acc.concat([{ name: k, value: cs[k].value }]);
+        },
+        esqArg
+    );
+}
+
 export function getControlStoreValue(
     inputValues: { [k: string]: any },
     esqlateDefinitionParameters: EsqlateParameter[],

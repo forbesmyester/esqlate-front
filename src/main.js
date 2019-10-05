@@ -2,14 +2,13 @@ import { get as getStoreValue, writable } from 'svelte/store';
 import App from './App.svelte';
 import { newlineBreak, html, normalize } from "esqlate-lib";
 import { waitFor } from 'waitfor-ts';
-import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
 import { resultDemandHTTP, loadDefinitionHTTP, getLoadDefinition } from "./middleware";
-import { getInputValues, getControlStoreValue, serializeValues } from "./controls";
+import { addControlStoreToEsqlateArguments, serializeValues } from "./controls";
 import { getQuery, getRequest, postRequest, errorHandler } from "./io";
 import promiseChain from "./promiseChain";
 
 
-const controls = writable({ credit: { value: 5 } });
+const controls = writable({});
 const statement = writable([]);
 const result = writable(false);
 const definition = writable({ statement: [ ] });
@@ -37,8 +36,9 @@ function hideResults(ctx) {
 
 
 function createRequest(ctx) {
-    const data = { "arguments": getQuery() };
+    const data = { "arguments": addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()) };
     const url = `/request/${ctx.params.definitionName}`;
+    // TODO: Catch 422 etc
     return postRequest(url, data)
         .then(resp => resp.json())
         .then((json) => {
