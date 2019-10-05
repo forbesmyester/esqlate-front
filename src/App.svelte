@@ -7,6 +7,7 @@
   export let run;
 
   let showingSql = true;
+  let md = new window.markdownit();
 
 
 </script>
@@ -32,7 +33,7 @@
       <i class="form-icon"></i>SQL
     </label>
 
-    <div class="modal-title h5">{ definition.title }</div>
+    <div class="modal-title h5">{ $definition.title }</div>
 
   </div>
   <div class="modal-body">
@@ -45,7 +46,7 @@
       {/each}
     </div>
     {:else}
-      <div>{@html $definition.description}</div>
+      <div>{@html md.render("" + $definition.description) }</div>
       <div class="form-group">
         {#each $definition.parameters as parameter}
           <label class="form-label" for="input-example-1">{parameter.name}</label>
