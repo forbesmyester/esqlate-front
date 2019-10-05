@@ -1,5 +1,5 @@
 import test from 'tape';
-import { getControlStoreValue, normalizeLink } from "../ts-src/controls";
+import { getControlStoreValue, normalizeLink, getLink, asRow } from "../ts-src/controls";
 import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect } from 'esqlate-lib';
 
 test("normalizeEsqlateLink", (assert) => {
@@ -27,7 +27,44 @@ test("normalizeEsqlateLink", (assert) => {
 
 });
 
-test('getQuery', (assert) => {
+test("renderLink", (assert) => {
+
+    const link: EsqlateLink = {
+        href: [
+            { type: "static", "static": "#request/customers?country=" },
+            { type: "argument", "argument": "country" },
+            { type: "static", "static": "&abc=123" },
+        ],
+        text: [
+            { type: "static", "static": "In " },
+            { type: "argument", "argument": "display" },
+        ],
+        class: "zz"
+    };
+
+    const expected = {
+        class: "zz",
+        href: "#request/customers?country=H%26M&abc=123",
+        text: "In H and M"
+    };
+
+    assert.plan(1);
+    assert.deepEqual(getLink(link, { country: "H&M", display: "H and M" }), expected);
+    assert.end();
+});
+
+test('asRow', (assert) => {
+    assert.plan(1);
+    assert.deepEqual(
+        asRow(
+            ["hi", 4],
+            [{name: "greeting", type: "string"}, {name: "age", type: "integer"}]
+        ),
+        { greeting: "hi", age: 4 }
+    );
+});
+
+test('getControlStoreValue', (assert) => {
     assert.plan(1);
 
     const result: EsqlateCompleteResult = {

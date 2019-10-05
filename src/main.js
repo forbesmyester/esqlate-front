@@ -38,7 +38,6 @@ function hideResults(ctx) {
 
 function createRequest(ctx) {
     const data = { "arguments": getQuery() };
-    console.log({data});
     const url = `/request/${ctx.params.definitionName}`;
     return postRequest(url, data)
         .then(resp => resp.json())
@@ -68,7 +67,6 @@ function waitForRequest(ctx) {
     return waitFor(getReady, calculateNewDelay)
         .then((loc) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(getStoreValue(controls))}`;
-            console.log(url);
             router.setRoute(url);
             return ctx;
         });

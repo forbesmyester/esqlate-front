@@ -1,5 +1,7 @@
 <script>
   import Parameter from "./Parameter.svelte";
+  import Link from "./Link.svelte";
+  import { asRow, normalizeLink, getLink } from "./controls";
   export let result;
   export let definition;
   export let statement;
@@ -8,7 +10,6 @@
 
   let showingSql = true;
   let md = new window.markdownit();
-
 
 </script>
 
@@ -94,6 +95,9 @@
                   {/if}
                 </td>
               {/if}
+            {/each}
+            {#each $definition.links  || [] as link}
+            <td style="text-align: center"><Link link={getLink(normalizeLink(link), asRow(row, $result.fields)) }/></td>
             {/each}
             </tr>
           {/each}

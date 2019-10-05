@@ -1,4 +1,4 @@
-import { EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateLinkItem } from "esqlate-lib";
+import { EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateLinkItem, EsqlateCompleteResult } from "esqlate-lib";
 import { OptionsForEsqlateParameterSelect } from "./types";
 
 /**
@@ -51,7 +51,7 @@ export function getControlStoreValue(
     }
 
     function selectSetValue(value: SelectControlStore["value"], options: SelectControlStore["options"]): SelectControlStore["value"] {
-        if (options.some((op) => { op.value == value })) { return value; }
+        if (options.some((op) => op.value == value)) { return value; }
         if (options.length) { return options[0].value; }
         return "";
     }
@@ -82,7 +82,6 @@ export function getControlStoreValue(
 }
 
 export function serializeValues(values: ControlStore) {
-    console.log(values);
     return Object.getOwnPropertyNames(values).map((k) => {
         const v = values[k].value;
         return `${encodeURIComponent(k)}=${encodeURIComponent(v)}`;
@@ -90,6 +89,7 @@ export function serializeValues(values: ControlStore) {
 }
 
 export function normalizeLink(e: EsqlateLink): EsqlateLink {
+
     function worker(href: EsqlateLink["href"]): EsqlateLink["href"] {
         if (typeof href != "string") {
             return href;
@@ -113,4 +113,47 @@ export function normalizeLink(e: EsqlateLink): EsqlateLink {
 
 }
 
+interface EsqlateRow { [k: string]: number | string | boolean; }
 
+export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"]): EsqlateRow {
+    return fields.reduce(
+        (acc: EsqlateRow, field: EsqlateCompleteResult["fields"][0], index) => {
+            return { ...acc, [field.name]: rawRow[index] };
+        },
+        {}
+    );
+}
+
+function renderLinkText(s: EsqlateLinkItem[], row: EsqlateRow, escape: boolean) {
+    if (typeof s == "string") {
+        throw new Error("renderLink: Requires normalizeLink to be called first: " + s);
+    }
+    return s.reduce(
+        (acc: string, ei: EsqlateLinkItem) => {
+            if (ei.type == "static") { return acc + ei.static; }
+                if (!row.hasOwnProperty(ei.argument)) {
+                    throw new Error("renderLink: Missing argument: " + ei.argument + ": " + JSON.stringify(row));
+                }
+                return escape ?
+                    (acc + encodeURIComponent(row[ei.argument])) :
+                    acc + row[ei.argument];
+        },
+        ""
+    );
+}
+
+interface EsqlateLinkForSvelte {
+    text: string;
+    href: string;
+    class: string;
+}
+
+export function getLink(e: EsqlateLink, row: EsqlateRow): EsqlateLinkForSvelte {
+    const text = e.hasOwnProperty("text") ? e.text as EsqlateLinkItem[]: e.href as EsqlateLinkItem[];
+    return {
+        text: renderLinkText(text, row, false),
+        href: renderLinkText(e.href as EsqlateLinkItem[], row, true),
+        class: e.hasOwnProperty("class") ? e.class as string : "",
+    };
+
+}
