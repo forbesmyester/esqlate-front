@@ -1,4 +1,4 @@
-import { EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult } from "esqlate-lib";
+import { EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateLinkItem } from "esqlate-lib";
 import { OptionsForEsqlateParameterSelect } from "./types";
 
 /**
@@ -88,3 +88,29 @@ export function serializeValues(values: ControlStore) {
         return `${encodeURIComponent(k)}=${encodeURIComponent(v)}`;
     }).join('&');
 }
+
+export function normalizeLink(e: EsqlateLink): EsqlateLink {
+    function worker(href: EsqlateLink["href"]): EsqlateLink["href"] {
+        if (typeof href != "string") {
+            return href;
+        }
+        let r: EsqlateLinkItem[] = [];
+        let match: RegExpMatchArray | null;
+        while (match = href.match(/(.*)\$\{([A-Z0-9a-z_ ]+)\}(.*)/)) {
+            r.push({ type: "static", "static": match[1] });
+            r.push({ type: "argument", "argument": match[2] });
+            r.push({ type: "static", "static": match[3] });
+            href = href.substr(match[0].length);
+        }
+        return r;
+    }
+
+    return {
+        ...e,
+        text: e.text ? worker(e.text) : worker(e.href),
+        href: worker(e.href)
+    }
+
+}
+
+

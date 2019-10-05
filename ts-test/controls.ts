@@ -1,6 +1,31 @@
 import test from 'tape';
-import { getControlStoreValue } from "../ts-src/controls";
-import {EsqlateCompleteResult, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect} from 'esqlate-lib';
+import { getControlStoreValue, normalizeLink } from "../ts-src/controls";
+import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect } from 'esqlate-lib';
+
+test("normalizeEsqlateLink", (assert) => {
+
+    const input: EsqlateLink = {
+        href: "#request/customers?country=${country}&abc=123"
+    }
+
+    const expected: EsqlateLink = {
+        href: [
+            { type: "static", "static": "#request/customers?country=" },
+            { type: "argument", "argument": "country" },
+            { type: "static", "static": "&abc=123" },
+        ],
+        text: [
+            { type: "static", "static": "#request/customers?country=" },
+            { type: "argument", "argument": "country" },
+            { type: "static", "static": "&abc=123" },
+        ]
+    };
+
+    assert.plan(1);
+    assert.deepEqual(normalizeLink(input), expected);
+    assert.end();
+
+});
 
 test('getQuery', (assert) => {
     assert.plan(1);
