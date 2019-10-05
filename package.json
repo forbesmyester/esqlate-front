@@ -1,0 +1,56 @@
+{
+  "name": "esqlate-front",
+  "version": "0.0.0",
+  "description": "SQL based functional CRUD",
+  "dependencies": {
+    "@types/tape": "^4.2.33",
+    "director": "^1.2.8",
+    "sirv-cli": "^0.4.4",
+    "spectre.css": "^0.5.8",
+    "tape": "^4.11.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "node-sass": "^4.12.0",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^1.12.0",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-livereload": "^1.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-svelte": "^5.0.3",
+    "rollup-plugin-terser": "^4.0.4",
+    "svelte": "^3.0.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
+  },
+  "scripts": {
+    "test": "parallel -j 1 ts-node {} ::: ts-test/*.?s",
+    "clean-ts": "parallel touch src/{/.}.js '&&' rm src/{/.}.js ::: ts-src/*.ts",
+    "build-ts": "npm run-script clean-ts && tsc && cp -R ts-build/ts-src/* src/",
+    "build": "npm run-script build-templates && npm run-script build-scss && npm run-script build-ts && rollup -c",
+    "build-rollup": "rollup -c",
+    "autobuild": "rollup -c -w",
+    "build-templates": "cat src/index.tpl.html | envsubst > public/index.html",
+    "build-scss": "node-sass src/index.scss > public/index.css",
+    "root-scss": "node-sass index.scss > index.css",
+    "dev": "run-p start:dev autobuild",
+    "start": "lighttpd -D -f ./lighttpd.conf",
+    "build-lighttpd": "cat ./lighttpd.tpl.conf | envsubst > lighttpd.conf",
+    "start:dev": "sirv public --single --dev --port $LISTEN_PORT"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forbesmyester/esqlate.git"
+  },
+  "keywords": [
+    "crud",
+    "postgresql"
+  ],
+  "author": "Matt Forrester <github@speechmarks.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/forbesmyester/esqlate/issues"
+  },
+  "homepage": "https://github.com/forbesmyester/esqlate#readme"
+}
