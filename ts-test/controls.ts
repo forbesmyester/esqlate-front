@@ -87,7 +87,6 @@ test('getControlStoreValue', (assert) => {
         definition: "customer_country_count",
         display_field: "display",
         value_field: "country",
-        allow_null: false,
     };
 
     assert.deepEqual(
