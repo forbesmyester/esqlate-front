@@ -1,6 +1,7 @@
 <script>
   import Parameter from "./Parameter.svelte";
   import Link from "./Link.svelte";
+  import { beforeUpdate, afterUpdate } from 'svelte';
   import { asRow, normalizeLink, getLink } from "./controls";
   export let result;
   export let definition;
@@ -8,8 +9,13 @@
   export let controls;
   export let run;
 
+  let popupMode = false;
   let showingSql = true;
   let md = new window.markdownit();
+
+  afterUpdate(() => {
+    console.log(Array.from(document.querySelectorAll('#results th')).map((th) => th.getBoundingClientRect()));
+  })
 
 </script>
 
@@ -26,41 +32,67 @@
   </div>
 {/if}
 
-<div id="code-holder" class="modal-container">
-  <div class="modal-header">
 
-    <label class="form-switch" style="float: right">
-      <input type="checkbox" bind:checked={showingSql}>
-      <i class="form-icon"></i>SQL
-    </label>
+<div class={ popupMode ? "modal active" : "" }>
+  <a href="#close" class="modal-overlay" aria-label="Close"></a>
+<div class="columns" style="margin-top: 2rem">
+  <div class="column col-auto modal-container code-popup" style="margin: auto">
 
-    <div class="modal-title h5">{ $definition.title }</div>
-
-  </div>
-  <div class="modal-body">
-
-    {#if showingSql}
-      <div class="code">
-        {#each $statement as line}
-          <div class="line">{#each line as item}{#if typeof item == "string"}<span>{item}</span>{:else}<Parameter bind:control={$controls[item.name]} parameter={item}/>{/if}{/each}
-        </div>
-      {/each}
+    <div class="modal-header">
+      <div class="container"><div class="columns">
+          <div class="column col-9">
+            <h3>
+              { $definition.title }
+            </h3>
+          </div>
+          <div class="column col-3">
+            <label class="form-switch" style="float: right">
+              <input type="checkbox" bind:checked={showingSql}>
+              SQL<i class="form-icon"></i>
+            </label>
+          </div>
+        </div></div>
     </div>
-    {:else}
-      <div>{@html md.render("" + $definition.description) }</div>
-      <div class="form-group">
+
+    <div class="modal-body">
+      {#if showingSql}
+      <div class="container"><div class="col-gapless columns">
+          <div class="code-code column col-12">
+            {#each $statement as line}
+            <div class="line">{#each line as item}{#if typeof item == "string"}<span>{item}</span>{:else}<Parameter bind:control={$controls[item.name]} parameter={item}/>{/if}{/each}
+            </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+      {:else}
+      <div class="col-gapless columns code-description">
+        <div class="column-12">
+          <div>{@html md.render("" + $definition.description) }</div>
+        </div>
+      </div>
+      <div class="form-horizontal code-form">
         {#each $definition.parameters as parameter}
-          <label class="form-label" for="input-example-1">{parameter.name}</label>
-          <Parameter bind:control={$controls[parameter.name]} parameter={parameter}/>
+        <div class="form-group">
+          <div class="column col-5 col-sm-12">
+            <label class="form-label" for={ "input-" + parameter.name }>{parameter.name}</label>
+          </div>
+          <div class="column col-7 col-sm-12">
+            <Parameter bind:control={$controls[parameter.name]} parameter={parameter}/>
+          </div>
+        </div>
         {/each}
       </div>
-    {/if}
+      {/if}
+    </div>
 
+    <div class="modal-footer">
+      <div class="container"><div class="col-gapless columns"><div class="column col-12">
+      <button class="btn btn-primary" on:click={run}>List</button>
+      </div></div></div>
+    </div>
   </div>
-  <div class="modal-footer">
-    <a class="btn btn-link" href="#modals">Cancel</a>
-    <button class="btn btn-primary" on:click={run}>List</button>
-  </div>
+</div>
 </div>
 
 {#if $result.status == "complete"}

@@ -48,27 +48,46 @@
 @import "node_modules/spectre.css/src/utilities";
 
 /* == Make SQL box appear in centre with content controlled width =========== */
-body { text-align: center; }
-#code-holder {
-    display: inline-flex;
+
+.code-popup {
     max-width: none;
-    width: auto;
-    text-align: left;
-    div.code {
-        background-color: $bg-color;
-        font-size: 85%;
-        padding: 1em;
+    max-height: none;
+    width: unset;
+
+    div.code-code div.code-form {
+        // background-color: $bg-color;
+        // padding: 1rem;
+    }
+
+    div.code-code {
+        padding: 1rem !important;
+        background-color: #f7f8f9;
         .line {
             white-space: pre;
             font-family: monospace;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.5rem;
             &:last-of-type {
-                margin-bottom: 0.5em;
+                margin-bottom: 0.5rem;
             }
         }
     }
+
 }
 
 /* == Misc ================================================================== */
-code { background: auto; }
-input[type="number"] { width: 4em; }
+input[type="number"] { width: 4rem; }
+.modal-overlay { background-color: $bg-color !important }
+
+table {
+    thead {
+        background-color: #dadee4;
+    }
+    // tbody td {
+    //     &:first-of-type {
+    //         border-left: 0.1rem solid #dadee4;
+    //     }
+    //     &:last-of-type {
+    //         border-right: 0.1rem solid #dadee4;
+    //     }
+    // }
+}

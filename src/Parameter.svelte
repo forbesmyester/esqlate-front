@@ -13,18 +13,18 @@ export let control;
 {/if}
 
 {#if parameter.type == "string"}
-  <input name={parameter.name} bind:value={control.value}>
+  <input id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
 {:else if parameter.type == "integer"}
-  <input type="number" name={parameter.name} bind:value={control.value}>
+  <input id={ "input-" + parameter.name } type="number" name={parameter.name} bind:value={control.value}>
 {:else if parameter.type == "server"}
   ${parameter.name}
 {:else if parameter.type == "select"}
   {#if control.options }
-    <select name={parameter.name} bind:value={control.value}>
+    <select id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
       {#each control.options as opt}
         <option value={opt.value}>{opt.display}</option>
       {/each}
-    </select>{control.value}
+    </select>
   {:else}
     {#if ("" + control.value) != "" }
       <strong>{control.value}</strong>

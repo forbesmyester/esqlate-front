@@ -1,4 +1,0 @@
-{ "filename": "ts", "command": "npm run-script build-ts && run-script build-rollup && npm run-script start" }
-{ "filename": "scss", "command": "npm run-script build-scss && run-script build-rollup && npm run-script start" }
-{ "filename": "js", "command": "run-script build-rollup && npm run-script start" }
-{ "filename": "svelte", "command": "run-script build-rollup && npm run-script start" }

@@ -1,8 +1,9 @@
 import { getQuery, getRequest, postRequest, errorHandler } from "../ts-src/io";
+import getCache from "esqlate-cache";
 import { getInputValues, getControlStoreValue, serializeValues } from "../ts-src/controls";
 import { get as getStoreValue, writable, Writable } from 'svelte/store';
-import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateArgument, EsqlateStatement, EsqlateCompleteResult } from "esqlate-lib";
-import { Controls } from "../ts-src/types";
+import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateArgument, EsqlateStatement, EsqlateCompleteResult, EsqlateResult } from "esqlate-lib";
+import { Cache, Controls } from "../ts-src/types";
 
 import test from 'tape';
 import {getLoadDefinition} from '../ts-src/middleware';
@@ -25,7 +26,8 @@ test('getLoadDefinition - simplist', (assert) => {
     let demandedResults: string[] = [];
 
     const ctx = { params: { definitionName: "customer_search" } };
-    function resultDemand(definitionName: EsqlateDefinition["name"], _args: EsqlateArgument[]) {
+
+    function resultDemand(definitionName: EsqlateDefinition["name"], _args: EsqlateArgument[]): Promise<EsqlateCompleteResult> {
         demandedResults.push(definitionName);
         const r: EsqlateCompleteResult = {
             status: "complete",
@@ -64,7 +66,13 @@ test('getLoadDefinition - simplist', (assert) => {
         });
     }
 
-    const loadDefinition = getLoadDefinition(controls, definition, statement,definitionRequest, resultDemand, getQuery);
+
+    const cache: Cache = {
+        definition: getCache(definitionRequest),
+        selectResult: getCache(resultDemand)
+    };
+
+    const loadDefinition = getLoadDefinition(controls, definition, statement, getQuery, cache);
 
     loadDefinition(ctx)
         .then((_ctx) => {
