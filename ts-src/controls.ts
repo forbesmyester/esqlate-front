@@ -1,5 +1,11 @@
-import { EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateLinkItem, EsqlateCompleteResult } from "esqlate-lib";
+import { normalize, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateCompleteResult, EsqlateStatementNormalized, EsqlateParameterString } from "esqlate-lib";
 import { OptionsForEsqlateParameterSelect } from "./types";
+
+export type EsqlateLinkNormalized = {
+    text: EsqlateStatementNormalized;
+    href: EsqlateStatementNormalized;
+    class: string;
+}
 
 /**
  * Takes the values from io/getQuery() and converts them into a simple KV pair.
@@ -13,24 +19,23 @@ export function getInputValues(query: EsqlateArgument[]): { [k: string]: any } {
     );
 }
 
-interface InputControlStore { value: string; }
-interface SelectControlStore {
-    value: string | number;
-    options: { value: string | number , display: string | number }[];
+export interface ControlStoreInputValue { value: string; }
+export interface ControlStoreSelectValue {
+    value: string;
+    options: { value: string, display: string}[];
 }
 
-interface ControlStore {
-    [k: string]: InputControlStore | SelectControlStore;
+export interface ControlStore {
+    [k: string]: ControlStoreInputValue | ControlStoreSelectValue;
 }
 
 export function addControlStoreToEsqlateArguments(cs: ControlStore, esqArg: EsqlateArgument[]): EsqlateArgument[] {
-    const alreadyHave: Set<String> = new Set(esqArg.map((ea) => ea.name));
+    const fromCs: Set<String> = new Set(Object.getOwnPropertyNames(cs));
     return Object.getOwnPropertyNames(cs).reduce(
         (acc: EsqlateArgument[], k: string) => {
-            if (alreadyHave.has(k)) { return acc; }
             return acc.concat([{ name: k, value: cs[k].value }]);
         },
-        esqArg
+        esqArg.filter(({ name }) => !fromCs.has(name))
     );
 }
 
@@ -40,7 +45,7 @@ export function getControlStoreValue(
     optionsForSelect: OptionsForEsqlateParameterSelect[]
 ): ControlStore {
 
-    function getOptions(parameter: EsqlateParameterSelect): SelectControlStore["options"] {
+    function getOptions(parameter: EsqlateParameterSelect): ControlStoreSelectValue["options"] {
         const ps = optionsForSelect.filter(o => o.parameter.name == parameter.name);
         if (ps.length === 0) { return []; }
         if (ps[0].result.status != "complete") { return [] } // TODO: Throw?
@@ -61,30 +66,28 @@ export function getControlStoreValue(
         });
     }
 
-    function selectSetValue(value: SelectControlStore["value"], options: SelectControlStore["options"]): SelectControlStore["value"] {
+    function selectSetValue(value: ControlStoreSelectValue["value"], options: ControlStoreSelectValue["options"]): ControlStoreSelectValue["value"] {
         if (options.some((op) => op.value == value)) { return value; }
         if (options.length) { return options[0].value; }
         return "";
     }
 
     function reducer(acc: ControlStore, item: EsqlateParameter): ControlStore {
-        let value: any = "";
+        let value: any = item.type == "integer" ? 0 : "";
         if (inputValues.hasOwnProperty(item.name)) {
             value = inputValues[item.name];
         }
-        switch (item.type) {
-            case "integer":
-                value = 0;
-                break;
-            case "select":
-                const options = getOptions(item as EsqlateParameterSelect);
-                return {...acc,
-                    [item.name]: {
-                        options,
-                        value: selectSetValue(value, options)
-                    }
+
+        if (item.type == "select") {
+            const options = getOptions(item as EsqlateParameterSelect);
+            return {...acc,
+                [item.name]: {
+                    options,
+                    value: selectSetValue(value, options)
                 }
+            }
         }
+
         return { ...acc, [item.name]: { value } };
     }
 
@@ -92,62 +95,55 @@ export function getControlStoreValue(
 
 }
 
-export function serializeValues(values: ControlStore) {
-    return Object.getOwnPropertyNames(values).map((k) => {
-        const v = values[k].value;
-        return `${encodeURIComponent(k)}=${encodeURIComponent(v)}`;
+export function serializeValues(values: EsqlateArgument[]) {
+    return values.map((ea) => {
+        return `${encodeURIComponent(ea.name)}=${encodeURIComponent(ea.value)}`;
     }).join('&');
 }
 
-export function normalizeLink(e: EsqlateLink): EsqlateLink {
+export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateLinkNormalized {
 
-    function worker(href: EsqlateLink["href"]): EsqlateLink["href"] {
-        if (typeof href != "string") {
-            return href;
-        }
-        let r: EsqlateLinkItem[] = [];
-        let match: RegExpMatchArray | null;
-        while (match = href.match(/(.*)\$\{([A-Z0-9a-z_ ]+)\}(.*)/)) {
-            r.push({ type: "static", "static": match[1] });
-            r.push({ type: "argument", "argument": match[2] });
-            r.push({ type: "static", "static": match[3] });
-            href = href.substr(match[0].length);
-        }
-        return r;
-    }
+    const params: EsqlateParameterString[] = namesOfFields.map(
+        (n) => ({ type: "string", name: n })
+    );
 
     return {
-        ...e,
-        text: e.text ? worker(e.text) : worker(e.href),
-        href: worker(e.href)
+        class: e.hasOwnProperty("class") ? e.class as string : "",
+        text: e.text ? normalize(params, e["text"]) : normalize(params, e["href"]),
+        href: normalize(params, e["href"])
     }
 
 }
 
 interface EsqlateRow { [k: string]: number | string | boolean; }
 
-export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"]): EsqlateRow {
+export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"], args: EsqlateArgument[]): EsqlateRow {
+    const argsAsOb = args.reduce(
+        (acc, arg) => {
+            return {...acc, [arg.name]: arg.value };
+        },
+        {}
+    );
     return fields.reduce(
         (acc: EsqlateRow, field: EsqlateCompleteResult["fields"][0], index) => {
             return { ...acc, [field.name]: rawRow[index] };
         },
-        {}
-    );
+        argsAsOb
+    )
 }
 
-function renderLinkText(s: EsqlateLinkItem[], row: EsqlateRow, escape: boolean) {
+function renderLinkText(s: EsqlateLinkNormalized["text"], row: EsqlateRow, escape: boolean) {
     if (typeof s == "string") {
         throw new Error("renderLink: Requires normalizeLink to be called first: " + s);
     }
     return s.reduce(
-        (acc: string, ei: EsqlateLinkItem) => {
-            if (ei.type == "static") { return acc + ei.static; }
-                if (!row.hasOwnProperty(ei.argument)) {
-                    throw new Error("renderLink: Missing argument: " + ei.argument + ": " + JSON.stringify(row));
-                }
-                return escape ?
-                    (acc + encodeURIComponent(row[ei.argument])) :
-                    acc + row[ei.argument];
+        (acc: string, ei) => {
+            if (typeof ei == "string") {
+                return acc = acc + ei;
+            }
+            return escape ?
+                (acc + encodeURIComponent(row[ei.name])) :
+                acc + row[ei.name];
         },
         ""
     );
@@ -159,12 +155,85 @@ interface EsqlateLinkForSvelte {
     class: string;
 }
 
-export function getLink(e: EsqlateLink, row: EsqlateRow): EsqlateLinkForSvelte {
-    const text = e.hasOwnProperty("text") ? e.text as EsqlateLinkItem[]: e.href as EsqlateLinkItem[];
+
+export function getLink(e: EsqlateLinkNormalized, row: EsqlateRow): EsqlateLinkForSvelte {
+    const text = e.hasOwnProperty("text") ? e.text : e.href;
     return {
         text: renderLinkText(text, row, false),
-        href: renderLinkText(e.href as EsqlateLinkItem[], row, true),
+        href: renderLinkText(e.href, row, true),
         class: e.hasOwnProperty("class") ? e.class as string : "",
     };
 
+}
+
+
+export function addBackValuesToControlStoreValue(qry: EsqlateArgument[], csv: ControlStore): ControlStore {
+    return qry.reduce(
+        (acc: ControlStore, esqArg: EsqlateArgument) => {
+            const m = esqArg.name.match(/^_b[a-z]{1,9}([0-9]{1,3})/);
+            if (!m) { return acc; }
+            return { ...acc, [m[0]]: { value: "" + esqArg.value } }
+        },
+        csv
+    );
+}
+
+
+type BackUrl = {
+    url: string;
+    field: string; // Field to set upon return
+    name: string; // The definition name
+}
+
+
+function getBackNumber(qry: EsqlateArgument[]): number {
+    return qry.reduce(
+        (acc, esqArg) => {
+            const m = esqArg.name.match(/^_burl([0-9]{1,3})/);
+            if (!m) { return acc; }
+            if (parseInt(m[1]) > acc) {
+                return parseInt(m[1]);
+            }
+            return acc;
+        },
+        -1
+    );
+}
+
+export function popBackFromArguments(qry: EsqlateArgument[]): BackUrl {
+    const desiredNumber = getBackNumber(qry);
+    if ((desiredNumber < 0)) {
+        throw new Error("popBackFromArguments: No back links found")
+    }
+    return qry.reduce(
+        (acc, esqArg) => {
+            const m = esqArg.name.match(/^_b([a-z]{0,9})([0-9]{1,3})/);
+            if (!m) { return acc; }
+            if (parseInt(m[2]) == desiredNumber) {
+                return { ...acc, [m[1]]: decodeURIComponent(esqArg.value as string) }
+            }
+            return acc;
+        },
+        { url: '', field: '', name: '' }
+    );
+}
+
+
+export function pushBackToControlStore(qry: ControlStore, url: BackUrl): ControlStore {
+    const desiredNumber: number = Object.getOwnPropertyNames(qry).reduce(
+        (acc, esqArg) => {
+            const m = esqArg.match(/^_burl([0-9]{1,3})/);
+            if (!m) { return acc; }
+            if (parseInt(m[1]) > acc) {
+                return parseInt(m[1]);
+            }
+            return acc;
+        },
+        -1
+    );
+    return {...qry,
+        ["_burl" + (desiredNumber + 1)]: { value: url.url },
+        ["_bfield" + (desiredNumber + 1)]: { value: url.field },
+        ["_bname" + (desiredNumber + 1)]: { value: url.name }
+    };
 }

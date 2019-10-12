@@ -1,6 +1,6 @@
 import { getQuery, getRequest, postRequest, errorHandler } from "../ts-src/io";
 import getCache from "esqlate-cache";
-import { getInputValues, getControlStoreValue, serializeValues } from "../ts-src/controls";
+import { getInputValues, getControlStoreValue } from "../ts-src/controls";
 import { get as getStoreValue, writable, Writable } from 'svelte/store';
 import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateArgument, EsqlateStatement, EsqlateCompleteResult, EsqlateResult } from "esqlate-lib";
 import { Cache, Controls } from "../ts-src/types";

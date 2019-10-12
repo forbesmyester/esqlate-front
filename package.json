@@ -4,6 +4,7 @@
   "description": "SQL based functional CRUD",
   "dependencies": {
     "@types/tape": "^4.2.33",
+    "debounce": "^1.2.0",
     "director": "^1.2.8",
     "esqlate-cache": "^1.0.1",
     "esqlate-waitfor": "^1.0.1",

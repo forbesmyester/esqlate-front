@@ -74,20 +74,32 @@
 
 }
 
-/* == Misc ================================================================== */
-input[type="number"] { width: 4rem; }
-.modal-overlay { background-color: $bg-color !important }
+.no-modal .code-popup {
+    box-shadow:none;
+    background-color: #f7f8f9;
+    border: 1px solid #dadee4;
+}
 
-table {
-    thead {
-        background-color: #dadee4;
+/* == Misc ================================================================== */
+    a {
+        font-weight: bold;
+        text-decoration: underline;
     }
-    // tbody td {
-    //     &:first-of-type {
-    //         border-left: 0.1rem solid #dadee4;
-    //     }
-    //     &:last-of-type {
-    //         border-right: 0.1rem solid #dadee4;
-    //     }
-    // }
+input[type="number"] { width: 4rem; }
+.modal-overlay { background: $bg-color !important }
+.modal-container { padding: $unit-4; }
+table thead { background-color: #dadee4; }
+div#main_links {
+    margin: 0 auto 3rem 0;
+    text-align: center;
+    a {
+        padding: 0 0.5rem;
+        border-right: 1px dashed black;
+        &:last-child { border-right: none; }
+    }
+}
+.input-popup {
+    text-align: right;
+    min-width: 8rem;
+    div { float: left }
 }

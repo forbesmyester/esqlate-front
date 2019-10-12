@@ -4,6 +4,7 @@ package-lock.json
 /css
 /node_modules
 /src/controls.js
+/src/user-actions.js
 /src/getFullUrlFromResponseUrl.js
 /src/io.js
 /src/types.js

@@ -1,6 +1,10 @@
 <script>
 export let parameter;
 export let control;
+export let popup
+function runPopup() {
+  popup(this.innerText);
+}
 </script>
 
 {#if parameter.type != "server"}
@@ -15,7 +19,7 @@ export let control;
 {#if parameter.type == "string"}
   <input id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
 {:else if parameter.type == "integer"}
-  <input id={ "input-" + parameter.name } type="number" name={parameter.name} bind:value={control.value}>
+  <input id={ "input-" + parameter.name } name={parameter.name} type="number" bind:value={control.value}>
 {:else if parameter.type == "server"}
   ${parameter.name}
 {:else if parameter.type == "select"}
@@ -32,6 +36,12 @@ export let control;
       <strong>${parameter.name}</strong>
     {/if}
   {/if}
+{:else if parameter.type == "popup"}
+<strong>
+  <button class="input-popup" on:click={() => popup(parameter.name)}>
+    <div>{control.value}</div>&nbsp;⯅
+  </button>
+</strong>
 {:else}
-  <strong>VARIABLE TYPE ${parameter.type} NOT SUPPORTED</strong>
+  '<strong>{control.value}</strong>'
 {/if}

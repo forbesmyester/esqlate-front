@@ -1,8 +1,8 @@
 import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
 import { URL } from "./types";
-import { EsqlateArgument, EsqlateParameter } from 'esqlate-lib';
+import { EsqlateArgument } from 'esqlate-lib';
 
-export function getQuery(): EsqlateArgument[] {
+export function getQuery(url?: string): EsqlateArgument[] {
 
     function paramsToR(usp: URLSearchParams) {
         let o = [];
@@ -13,7 +13,11 @@ export function getQuery(): EsqlateArgument[] {
     }
 
     return paramsToR(
-        new URLSearchParams(window.location.hash.replace(/.*\?/, ''))
+        new URLSearchParams(
+            url ?
+                url.replace(/.*\?/, '') :
+                window.location.hash.replace(/.*\?/, '')
+        )
     );
 
 }
@@ -28,7 +32,6 @@ export function getRequest(apiUrl: URL): Promise<Response> {
     const opts: RequestInit = {
         mode: "cors",
         cache: "no-cache",
-        // credentials: "include",
         headers: { "x-no-redirect": "1", "Content-Type": "application/json" },
     };
     return fetch(url, opts);
@@ -40,7 +43,6 @@ export function postRequest(apiUrl: URL, data: any) {
         method: "POST",
         mode: "cors",
         cache: "no-cache",
-        // credentials: "include",
         headers: { "x-no-redirect": "1", "Content-Type": "application/json" },
         body: JSON.stringify(data)
     };
@@ -48,7 +50,6 @@ export function postRequest(apiUrl: URL, data: any) {
 }
 
 export function errorHandler(e: Error) {
-    console.log(e);
     alert(e.message);
 }
 
