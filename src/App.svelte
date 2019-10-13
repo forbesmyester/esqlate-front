@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { get as getStoreValue } from 'svelte/store';
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
@@ -16,14 +17,14 @@
   let md = new window.markdownit();
 
   let args = [];
-  controls.subscribe((controlValue) => {
-    console.log(controlValue);
+  const unsub = controls.subscribe((controlValue) => {
     args = Object.getOwnPropertyNames(controlValue || {}).map(
       (name) => {
         return { name: name, value: controlValue[name].value }
       }
     );
   });
+  onDestroy(unsub);
 </script>
 
 {#if $result.status == "error"}
