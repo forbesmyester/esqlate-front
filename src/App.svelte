@@ -60,7 +60,7 @@
   <a class="off-canvas-overlay"
      href="#close"
      on:click|preventDefault={hideSidebar}
-     ></a>
+     >&nbsp;</a>
 
   <div class="off-canvas-content">
 
