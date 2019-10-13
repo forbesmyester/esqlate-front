@@ -16,6 +16,11 @@ const statement = writable([]);
 const result = writable(false);
 const definition = writable({ statement: [ ] });
 const variables = [ ];
+const menu = writable([]);
+
+getRequest("/")
+    .then(resp => resp.json())
+    .then((j) => { menu.set(j); });
 
 const cache = {
     definition: getCache(loadDefinitionHTTP),
@@ -56,7 +61,8 @@ const app = new App({
         popup,
         pick,
         cancel,
-        popupMode
+        popupMode,
+        menu
     }
 });
 

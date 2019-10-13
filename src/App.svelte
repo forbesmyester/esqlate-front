@@ -1,8 +1,10 @@
 <script>
+
   import { onDestroy } from 'svelte';
   import { get as getStoreValue } from 'svelte/store';
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
+
   export let pick;
   export let result;
   export let definition;
@@ -12,6 +14,7 @@
   export let cancel;
   export let popup;
   export let popupMode;
+  export let menu;
 
   let showingSql = true;
   let md = new window.markdownit();
@@ -25,7 +28,41 @@
     );
   });
   onDestroy(unsub);
+
+  let sidebarActive = false;
+  function showSidebar() { sidebarActive = true; }
+  function hideSidebar() { sidebarActive = false; }
+
 </script>
+
+<div class="off-canvas">
+  <!-- off-screen toggle button -->
+  <a class="off-canvas-toggle btn btn-link"
+     href="#sidebar-id"
+     on:click|preventDefault={showSidebar}
+     >
+     ☰
+  </a>
+
+  <div id="sidebar-id" class={ sidebarActive ? "off-canvas-sidebar active" : "off-canvas-sidebar" }>
+    <div id="logo">eSQLate</div>
+    <ul>
+      {#each $menu as item}
+      <li>
+        <a href={"#/" + item.name} on:click={hideSidebar}>
+          {item.title}
+        </a>
+      </li>
+      {/each}
+    </ul>
+  </div>
+
+  <a class="off-canvas-overlay"
+     href="#close"
+     on:click|preventDefault={hideSidebar}
+     ></a>
+
+  <div class="off-canvas-content">
 
 {#if $result.status == "error"}
   <div class="columns">
@@ -116,3 +153,5 @@
 <ResultTable args={args} inPopup={false} definition={$definition} result={$result}/>
 </div>
 {/if}
+  </div>
+</div>

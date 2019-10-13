@@ -47,6 +47,10 @@
 @import "node_modules/spectre.css/src/animations";
 @import "node_modules/spectre.css/src/utilities";
 
+// Left Menu
+@import "node_modules/spectre.css/src/off-canvas";
+
+
 /* == Make SQL box appear in centre with content controlled width =========== */
 
 .code-popup {
@@ -103,4 +107,22 @@ div#main_links {
     text-align: right;
     min-width: 8rem;
     div { float: left }
+}
+#sidebar-id {
+    #logo {
+        font-size: 2rem;
+        font-weight: bold;
+        background-color: black;
+        color: white;
+        margin: 2rem;
+        padding: 2rem;
+    }
+    ul, #logo {
+        margin: 2rem;
+        list-style: none;
+    }
+    li a {
+        margin: 1rem;
+        color: #3b4351;
+    }
 }
