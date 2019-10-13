@@ -34,7 +34,7 @@ function pick(row) {
 
 function cancel() {
     const qry = getQuery();
-    router.setRoute(decodeURIComponent(popBackFromArguments(qry).url));
+    router.setRoute(popBackFromArguments(qry).url);
 }
 
 function run() {
