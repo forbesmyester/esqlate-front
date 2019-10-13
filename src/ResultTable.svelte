@@ -12,14 +12,49 @@
 
   const id = inPopup ? "in-popup-results" : "out-popup-results";
 
+
+  function resizeResultHeight() {
+    // Perhaps set height
+    if (Array.from(document.querySelectorAll(`#${id} .results-body tr:first-child td`)).length) {
+      let desiredHeight = window.innerHeight - (document.querySelector(`#${id} .results-body tr:first-child td`).top);
+      const bottomTrPos = document.querySelector(`#${id} .results-body tr:last-child td`).getBoundingClientRect().bottom;
+      let scrollDesirable = bottomTrPos > window.innerHeight;
+      if (inPopup && bottomTrPos > window.innerHeight - 150) {
+        desiredHeight = 300;
+        scrollDesirable = true;
+      }
+      if ((desiredHeight > 200) && scrollDesirable) {
+        return [
+          `#${id} .results-body { display: block; max-height: ${desiredHeight}px; overflow-y: scroll; }`,
+          `#${id} .results-head { display: block; overflow-y: scroll; }`,
+        ];
+      }
+    }
+    return []
+  }
+
+  function resetStylesheet() {
+    const stylesheet = document.getElementById(id + "-style").sheet;
+    for (let i = 0; i < stylesheet.rules.length; i++) {
+      stylesheet.removeRule(0);
+    }
+    return stylesheet;
+  }
+
+
   function syncTable() {
+
+    const stylesheet = resetStylesheet();
+
+    resizeResultHeight().map((rule) => {
+      stylesheet.insertRule(rule);
+    });
 
 
     const tds = Array.from(document.querySelectorAll(`#${id} .results-body tr:first-child td`))
       .map((td) => td.getBoundingClientRect());
     const ths = Array.from(document.querySelectorAll(`#${id} .results-head th`))
       .map((th) => th.getBoundingClientRect());
-    const stylesheet = document.getElementById(id + "-style").sheet;
     const initialWidths = tds.map(
       (_td, i) => tds[i].width > ths[i].width ? tds[i].width : ths[i].width
     );
@@ -30,15 +65,13 @@
     const extraWidth = (currentWidth < requiredWidth) ? requiredWidth - currentWidth : 0;
     const widths = tds.map((_td, i) => {
       if (i == 0) {
-        return initialWidths[i] +
-          Math.floor(extraWidth / initialWidths.length) +
-          extraWidth % initialWidths.length;
+        return Math.floor(initialWidths[i] +
+          (extraWidth / initialWidths.length) +
+          (extraWidth % initialWidths.length));
       }
-      return initialWidths[i] + Math.floor(extraWidth / initialWidths.length);
+      return Math.floor(initialWidths[i] + (extraWidth / initialWidths.length));
     });
 
-    // Remove old rules
-    for (let i = 0; i < stylesheet.rules.length; i++) { stylesheet.removeRule(0); }
 
     // Set widths
     for (let i = 0; i < widths.length; i++) {
@@ -47,19 +80,6 @@
       stylesheet.insertRule(cssRule);
     }
 
-    // Perhaps set height
-    if (tds.length) {
-      let desiredHeight = window.innerHeight - (tds[0].top);
-      let scrollDesirable = document.querySelector(`#${id} .results-body tr:last-child td`).getBoundingClientRect().top > window.innerHeight;
-      if (inPopup) {
-        desiredHeight = 300;
-        scrollDesirable = true;
-      }
-      if ((desiredHeight > 200) && scrollDesirable) {
-        const rule = `#${id} .results-body { max-height: ${desiredHeight}px; overflow-y: scroll; }`;
-        stylesheet.insertRule(rule);
-      }
-    }
     stylesheet.insertRule(`#${id} { max-width: ${window.innerWidth - 32} }`);
   }
 

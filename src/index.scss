@@ -63,12 +63,9 @@
         padding: 1rem !important;
         background-color: #f7f8f9;
         .line {
-            white-space: pre;
-            font-family: monospace;
             margin-bottom: 0.5rem;
-            &:last-of-type {
-                margin-bottom: 0.5rem;
-            }
+            &:last-of-type { margin-bottom: 0.5rem; }
+            span { white-space: pre; font-family: monospace; }
         }
     }
 
@@ -86,9 +83,13 @@
         text-decoration: underline;
     }
 input[type="number"] { width: 4rem; }
-.modal-overlay { background: $bg-color !important }
+.no-modal .modal-overlay { display: none; font-size: 0px; }
+.modal-overlay { background: $bg-color !important; color: $bg-color !important; }
 .modal-container { padding: $unit-4; }
 table thead { background-color: #dadee4; }
+div.in-popup div#main_links {
+    margin: 0 auto 1.2rem 0;
+}
 div#main_links {
     margin: 0 auto 3rem 0;
     text-align: center;

@@ -40,7 +40,7 @@
 {/if}
 
 
-<div class={ ($popupMode) ? "modal active" : "no-modal" } style="margin-bottom: 3em">
+<div class={ ($popupMode) ? "modal active in-popup" : "no-modal" }>
   <a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
   <div class="columns" style={ $popupMode ? "" : "margin-top: 2rem"}>
   <div class="column col-auto modal-container code-popup" style="margin: auto">
@@ -92,10 +92,10 @@
       </div>
       {/if}
     </div>
+      {#if $popupMode}
+      <ResultTable args={args} pick={pick} inPopup={true} definition={$definition} result={$result}/>
+      {/if}
 
-    {#if $popupMode}
-    <ResultTable args={args} pick={pick} inPopup={true} definition={$definition} result={$result}/>
-    {/if}
 
 
     <div class="modal-footer">
@@ -111,5 +111,7 @@
 </div>
 
 {#if !$popupMode}
+<div style="margin-top: 3em" class={ ($popupMode) ? "in-popup" : "" }>
 <ResultTable args={args} inPopup={false} definition={$definition} result={$result}/>
+</div>
 {/if}
