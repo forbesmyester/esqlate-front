@@ -27,6 +27,17 @@ export function getApiRoot(): URL {
     return (bodyElement.dataset.apiServer as string).replace(/\/$/, '');
 }
 
+function throwOnInvalidStatusCodes(apiUrl: URL, resp: Response): Response {
+    if ((resp.status < 200) || (resp.status >= 300)) {
+        throw new Error(
+            `HTTP Request to ${apiUrl} returned status code ` +
+            `${resp.status} but I was expecting something in the ` +
+            `200 range`
+        );
+    }
+    return resp;
+}
+
 export function getRequest(apiUrl: URL): Promise<Response> {
     const url = getFullUrlFromResponseUrl(getApiRoot(), apiUrl);
     const opts: RequestInit = {
@@ -34,7 +45,8 @@ export function getRequest(apiUrl: URL): Promise<Response> {
         cache: "no-cache",
         headers: { "x-no-redirect": "1", "Content-Type": "application/json" },
     };
-    return fetch(url, opts);
+    return fetch(url, opts)
+        .then(throwOnInvalidStatusCodes.bind(null, apiUrl));
 }
 
 export function postRequest(apiUrl: URL, data: any) {
@@ -46,7 +58,8 @@ export function postRequest(apiUrl: URL, data: any) {
         headers: { "x-no-redirect": "1", "Content-Type": "application/json" },
         body: JSON.stringify(data)
     };
-    return fetch(url, opts);
+    return fetch(url, opts)
+        .then(throwOnInvalidStatusCodes.bind(null, apiUrl));
 }
 
 export function errorHandler(e: Error) {
