@@ -123,7 +123,13 @@
             <label class="form-label" for={ "input-" + parameter.name }>{parameter.name}</label>
           </div>
           <div class="column col-7 col-sm-12">
+            {#if parameter.type == "static"}
+            <label class="form-label" >
             <Parameter popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            </label>
+            {:else}
+            <Parameter popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            {/if}
           </div>
         </div>
         {/each}
