@@ -1,12 +1,12 @@
-import { getQuery, getRequest, postRequest, errorHandler } from "../ts-src/io";
+import { getRequest, postRequest, errorHandler } from "../ts-src/io";
 import getCache from "esqlate-cache";
-import { getInputValues, getControlStoreValue } from "../ts-src/controls";
+import { getControlStore, urlSearchParamsToArguments } from "../ts-src/controls";
 import { get as getStoreValue, writable, Writable } from 'svelte/store';
 import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateArgument, EsqlateStatement, EsqlateCompleteResult, EsqlateResult } from "esqlate-lib";
 import { Cache, Controls } from "../ts-src/types";
 
 import test from 'tape';
-import {getLoadDefinition} from '../ts-src/middleware';
+import {getInitilizeControls, getLoadDefinition} from '../ts-src/middleware';
 
 test('getLoadDefinition - simplist', (assert) => {
     assert.plan(5);
@@ -21,7 +21,7 @@ test('getLoadDefinition - simplist', (assert) => {
         "statement": ""
     });
     let statement: Writable<EsqlateStatementNormalized[]> = writable([]);
-    const getQuery = () => [{ name: "search_string", value: "Rob" },{ name: "unused", value: "value" }];
+    const getURLSearchParams = () => new URLSearchParams("?search_string=Rob&unused=value");
     let requestedDefinitions: string[] = [];
     let demandedResults: string[] = [];
 
@@ -67,14 +67,14 @@ test('getLoadDefinition - simplist', (assert) => {
     }
 
 
-    const cache: Cache = {
-        definition: getCache(definitionRequest),
-        selectResult: getCache(resultDemand)
-    };
+    const cacheDefinition = getCache(definitionRequest);
+    const cacheCompleteResultForSelect = getCache(resultDemand);
 
-    const loadDefinition = getLoadDefinition(controls, definition, statement, getQuery, cache);
+    const loadDefinition = getLoadDefinition(cacheDefinition, definition);
+    const initializeControls = getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect);
 
     loadDefinition(ctx)
+        .then(initializeControls)
         .then((_ctx) => {
             assert.is(
                 (getStoreValue(definition) as EsqlateDefinition).name,

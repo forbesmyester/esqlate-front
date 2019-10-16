@@ -2,24 +2,8 @@ import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
 import { URL } from "./types";
 import { EsqlateArgument } from 'esqlate-lib';
 
-export function getQuery(url?: string): EsqlateArgument[] {
-
-    function paramsToR(usp: URLSearchParams) {
-        let o = [];
-        for (let [k, v] of usp.entries()) {
-            o.push({ name: k, value: v});
-        }
-        return o;
-    }
-
-    return paramsToR(
-        new URLSearchParams(
-            url ?
-                url.replace(/.*\?/, '') :
-                window.location.hash.replace(/.*\?/, '')
-        )
-    );
-
+export function getURLSearchParams(): URLSearchParams {
+    return new URLSearchParams(window.location.hash.replace(/.*\?/, ''));
 }
 
 export function getApiRoot(): URL {

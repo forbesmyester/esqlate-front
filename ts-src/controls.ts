@@ -7,28 +7,32 @@ export type EsqlateLinkNormalized = {
     class: string;
 }
 
-/**
- * Takes the values from io/getQuery() and converts them into a simple KV pair.
- */
-export function getInputValues(query: EsqlateArgument[]): { [k: string]: any } {
-   return query.reduce(
-        (acc: { [k: string]: any }, { name, value }: any) => {
-            return { ...acc, [name]: value };
-        },
-        {}
-    );
-}
 
 export interface ControlStoreInputValue { value: string; }
 export interface ControlStoreSelectValue {
     value: string;
     options: { value: string, display: string}[];
 }
-
+type ControlStoreItem = ControlStoreInputValue | ControlStoreSelectValue;
 export interface ControlStore {
-    [k: string]: ControlStoreInputValue | ControlStoreSelectValue;
+    [k: string]: ControlStoreItem;
 }
 
+
+export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateArgument[] {
+
+    let o = [];
+    for (let [k, v] of url.entries()) {
+        o.push({ name: k, value: v});
+    }
+    return o;
+
+}
+
+
+/**
+ * Merges `esqArg` and `cs` with cs taking precedence.
+ */
 export function addControlStoreToEsqlateArguments(cs: ControlStore, esqArg: EsqlateArgument[]): EsqlateArgument[] {
     const fromCs: Set<String> = new Set(Object.getOwnPropertyNames(cs));
     return Object.getOwnPropertyNames(cs).reduce(
@@ -39,11 +43,19 @@ export function addControlStoreToEsqlateArguments(cs: ControlStore, esqArg: Esql
     );
 }
 
-export function getControlStoreValue(
-    inputValues: { [k: string]: any },
+export function getControlStore(
+    query: EsqlateArgument[],
     esqlateDefinitionParameters: EsqlateParameter[],
     optionsForSelect: OptionsForEsqlateParameterSelect[]
 ): ControlStore {
+
+   const inputValues: Map<string, EsqlateArgument["value"]> = query.reduce(
+        (acc, { name, value }: any) => {
+            acc.set(name, value);
+            return acc;
+        },
+        new Map()
+    );
 
     function getOptions(parameter: EsqlateParameterSelect): ControlStoreSelectValue["options"] {
         const ps = optionsForSelect.filter(o => o.parameter.name == parameter.name);
@@ -74,8 +86,8 @@ export function getControlStoreValue(
 
     function reducer(acc: ControlStore, item: EsqlateParameter): ControlStore {
         let value: any = item.type == "integer" ? 0 : "";
-        if (inputValues.hasOwnProperty(item.name)) {
-            value = inputValues[item.name];
+        if (inputValues.has(item.name)) {
+            value = inputValues.get(item.name);
         }
 
         if (item.type == "select") {
@@ -167,7 +179,7 @@ export function getLink(e: EsqlateLinkNormalized, row: EsqlateRow): EsqlateLinkF
 }
 
 
-export function addBackValuesToControlStoreValue(qry: EsqlateArgument[], csv: ControlStore): ControlStore {
+export function addBackValuesToControlStore(qry: EsqlateArgument[], csv: ControlStore): ControlStore {
     return qry.reduce(
         (acc: ControlStore, esqArg: EsqlateArgument) => {
             const m = esqArg.name.match(/^_b[a-z]{1,9}([0-9]{1,3})/);
@@ -237,3 +249,17 @@ export function pushBackToControlStore(qry: ControlStore, url: BackUrl): Control
         ["_bname" + (desiredNumber + 1)]: { value: url.name }
     };
 }
+
+// ControlStoreItem -> sql
+// ControlQueryItem -> ControlStoreItem
+
+// function updateControlStoreItem(parameter: EsqlateParameter, inputValue: string): ControlStoreItem {
+// }
+
+// getControlStore - only used in middleware, once
+// getQuery - massive use - takes querystring (or not} and converts to { name, value }[] - consider replacing for getURLSearchParams() in io 
+// popBackFromArguments - used twice takes getQuery result, removes highest back and returns url, move both into user-actions
+// addControlStoreToEsqlateArguments - always used with serializeValues except when posting for SQL - merges ControlStore and getQuery() with ControlStore taking precedence.
+// serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()))
+// store -> display
+// display -> value

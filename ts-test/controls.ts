@@ -1,5 +1,5 @@
 import test from 'tape';
-import { getControlStoreValue, normalizeLink, getLink, asRow, addBackValuesToControlStoreValue, ControlStoreInputValue, popBackFromArguments, pushBackToControlStore, EsqlateLinkNormalized } from "../ts-src/controls";
+import { getControlStore, normalizeLink, getLink, asRow, addBackValuesToControlStore, ControlStoreInputValue, popBackFromArguments, pushBackToControlStore, EsqlateLinkNormalized } from "../ts-src/controls";
 import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateArgument } from 'esqlate-lib';
 
 test("normalizeEsqlateLink", (assert) => {
@@ -68,7 +68,7 @@ test('asRow', (assert) => {
     );
 });
 
-test('getControlStoreValue', (assert) => {
+test('getControlStore', (assert) => {
     assert.plan(1);
 
     const result: EsqlateCompleteResult = {
@@ -94,8 +94,8 @@ test('getControlStoreValue', (assert) => {
     };
 
     assert.deepEqual(
-        getControlStoreValue(
-            { "b": "four" },
+        getControlStore(
+            [{ name: "b", value: "four" }],
             [
                 { name: "a", type: "integer" } as EsqlateParameterInteger,
                 { name: "b", type: "string" } as EsqlateParameterString,
@@ -119,12 +119,12 @@ test('getControlStoreValue', (assert) => {
 
 });
 
-test('getControlStoreValue a bug', (assert) => {
+test('getControlStore a bug', (assert) => {
     assert.plan(1);
 
     assert.deepEqual(
-        getControlStoreValue(
-            { "b": 10881 },
+        getControlStore(
+            [{ name: "b", value: 10881 }],
             [{ name: "b", type: "integer" } as EsqlateParameterInteger],
             []
         ),
@@ -150,7 +150,7 @@ test("addBackValuesToControlStoreValue", (assert) => {
         { name: "_bfield1", value: "bf2" } as EsqlateArgument,
     ];
 
-    const result = addBackValuesToControlStoreValue(
+    const result = addBackValuesToControlStore(
         inputQuery,
         inputControlStoreValue
     );

@@ -1,6 +1,6 @@
 import {EsqlateDefinition, EsqlateParameterPopup, EsqlateArgument, EsqlateCompleteResult} from 'esqlate-lib';
-import {ControlStore, serializeValues, addControlStoreToEsqlateArguments, addBackValuesToControlStoreValue, pushBackToControlStore, popBackFromArguments} from './controls';
-import {getQuery} from './io';
+import {ControlStore, serializeValues, addControlStoreToEsqlateArguments, addBackValuesToControlStore, pushBackToControlStore, popBackFromArguments, urlSearchParamsToArguments} from './controls';
+import { getURLSearchParams } from './io';
 
 export function popup(parameterName: string, definition: EsqlateDefinition, controls: ControlStore) {
     const definitionName = definition.name;
@@ -18,7 +18,7 @@ export function popup(parameterName: string, definition: EsqlateDefinition, cont
         `/${encodeURIComponent(definitionName)}?${qs}`
     );
 
-    const existingBack = addBackValuesToControlStoreValue(getQuery(), {});
+    const existingBack = addBackValuesToControlStore(urlSearchParamsToArguments(getURLSearchParams()), {});
     const newBacks = pushBackToControlStore(
         existingBack,
         {
@@ -49,7 +49,7 @@ export function pick(row: {[x: string]: any;}, query: EsqlateArgument[], result:
         throw new Error(`Return is a field that doesn't exist ${back.field}`);
     }
 
-    const newQsValues = getQuery(back.url)
+    const newQsValues = urlSearchParamsToArguments(new URLSearchParams(back.url.replace(/.*\?/, '')))
         .filter((esqArg) => esqArg.name != back.field)
         .concat([{ name: back.field, value: row[fieldIndex] }]);
 

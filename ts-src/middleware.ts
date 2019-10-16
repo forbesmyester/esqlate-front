@@ -1,10 +1,12 @@
 import { getRequest, postRequest } from "./io";
-import { getInputValues, getControlStoreValue } from "./controls";
+import { getControlStore, urlSearchParamsToArguments } from "./controls";
 import { get as getStoreValue, Writable } from 'svelte/store';
-import { EsqlateStatementNormalized, newlineBreak, normalize, EsqlateDefinition, EsqlateArgument, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter } from "esqlate-lib";
-import { Cache, OptionsForEsqlateParameterSelect, Controls } from "./types";
+import { EsqlateStatementNormalized, newlineBreak, normalize, EsqlateDefinition, EsqlateArgument, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter, EsqlateCompleteResult } from "esqlate-lib";
+import { OptionsForEsqlateParameterSelect, Controls } from "./types";
+import { Cache } from "esqlate-cache";
 
 interface LoadDefinitionCtx { definition?: EsqlateDefinition, params: { definitionName: string } }
+interface LoadedDefinitionCtx { definition: EsqlateDefinition, params: { definitionName: string } }
 
 
 export async function loadDefinitionHTTP(definitionName: EsqlateDefinition["name"]): Promise<EsqlateDefinition> {
@@ -22,35 +24,45 @@ export async function resultDemandHTTP(definitionName: EsqlateDefinition["name"]
 }
 
 
-export function getLoadDefinition(
-    controls: Writable<Controls>,
-    definition: Writable<EsqlateDefinition>,
-    statement: Writable<EsqlateStatementNormalized[]>,
-    getQuery: () => EsqlateArgument[],
-    cache: Cache
+export function getInitilizeControls(
+    controlsWritable: Writable<Controls>,
+    statementWritable: Writable<EsqlateStatementNormalized[]>,
+    getURLSearchParams: () => URLSearchParams,
+    cacheCompleteResultForSelect: Cache<EsqlateCompleteResult>
 ) {
+    return async function loadDefinition(ctx: LoadedDefinitionCtx): Promise<LoadedDefinitionCtx> {
 
-    return async function loadDefinition(ctx: LoadDefinitionCtx): Promise<LoadDefinitionCtx> {
+        const definition: EsqlateDefinition = ctx.definition;
 
-        const json = await cache.definition(ctx.params.definitionName);
-
-        const selects = <EsqlateParameterSelect[]>json.parameters.filter((p) => {
+        const selects = <EsqlateParameterSelect[]>definition.parameters.filter((p) => {
             return p.type == "select"
         });
 
         const options: OptionsForEsqlateParameterSelect[] = await Promise.all(
             selects.map((parameter) => {
-                return cache.selectResult(parameter.definition)
+                return cacheCompleteResultForSelect(parameter.definition)
                     .then((result) => {
                         return { parameter, result };
                     });
             })
         );
 
-        controls.set(getControlStoreValue(getInputValues(getQuery()), json.parameters, options));
-        definition.set(json);
-        statement.set(newlineBreak(normalize(json.parameters, json.statement)));
+        controlsWritable.set(getControlStore(urlSearchParamsToArguments(getURLSearchParams()), definition.parameters, options));
+        statementWritable.set(newlineBreak(normalize(definition.parameters, definition.statement)));
         return ctx;
+    }
+}
+
+
+export function getLoadDefinition(
+    cacheDefinition: Cache<EsqlateDefinition>,
+    definitionWritable: Writable<EsqlateDefinition>
+) {
+
+    return async function loadDefinition(ctx: LoadDefinitionCtx): Promise<LoadedDefinitionCtx> {
+        const definition = await cacheDefinition(ctx.params.definitionName)
+        definitionWritable.set(definition);
+        return {...ctx, definition};
     };
 
 }

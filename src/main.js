@@ -1,10 +1,9 @@
 import { get as getStoreValue, writable } from 'svelte/store';
 import App from './App.svelte';
-import { newlineBreak, html, normalize } from "esqlate-lib";
 import { waitFor } from 'esqlate-waitfor';
-import { resultDemandHTTP, loadDefinitionHTTP, getLoadDefinition } from "./middleware";
-import { addBackValuesToControlStoreValue, addControlStoreToEsqlateArguments, popBackFromArguments, pushBackToControlStore, serializeValues } from "./controls";
-import { getQuery, getRequest, postRequest, errorHandler } from "./io";
+import { resultDemandHTTP, loadDefinitionHTTP, getInitilizeControls, getLoadDefinition } from "./middleware";
+import { addControlStoreToEsqlateArguments, popBackFromArguments, serializeValues, urlSearchParamsToArguments } from "./controls";
+import { getURLSearchParams, getRequest, postRequest, errorHandler } from "./io";
 import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
 import { pick as runPick, popup as runPopup } from "./user-actions";
@@ -22,6 +21,10 @@ getRequest("/")
     .then(resp => resp.json())
     .then((j) => { menu.set(j); });
 
+
+const cacheDefinition = getCache(loadDefinitionHTTP);
+const cacheCompleteResultForSelect = getCache(resultDemandHTTP);
+
 const cache = {
     definition: getCache(loadDefinitionHTTP),
     selectResult: getCache(resultDemandHTTP)
@@ -33,18 +36,17 @@ function popup(row) {
 }
 
 function pick(row) {
-    const route = runPick(row, getQuery(), getStoreValue(result));
+    const route = runPick(row, urlSearchParamsToArguments(getURLSearchParams()), getStoreValue(result));
     router.setRoute(route);
 }
 
 function cancel() {
-    const qry = getQuery();
-    router.setRoute(popBackFromArguments(qry).url);
+    router.setRoute(popBackFromArguments(urlSearchParamsToArguments(getURLSearchParams())).url);
 }
 
 function run() {
     const definitionName = getStoreValue(definition).name;
-    const qs = serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()));
+    const qs = serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())));
     const route = `/${encodeURIComponent(definitionName)}/request?${qs}`
     router.setRoute(route);
 }
@@ -74,14 +76,14 @@ function hideResults(ctx) {
 
 
 function createRequest(ctx) {
-    const data = { "arguments": addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()) };
+    const data = { "arguments": addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())) };
     const url = `/request/${ctx.params.definitionName}`;
 
     // TODO: Catch 422 etc
     return postRequest(url, data)
         .then(resp => resp.json())
         .then((json) => {
-            const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()))}`;
+            const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
             router.setRoute(url);
             return ctx;
         });
@@ -105,7 +107,7 @@ function waitForRequest(ctx) {
 
     return waitFor(getReady, calculateNewDelay)
         .then((loc) => {
-            const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()))}`;
+            const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
             router.setRoute(url);
             return ctx;
         });
@@ -122,7 +124,7 @@ function loadResults(ctx) {
 
 
 function setPopupMode(ctx) {
-    popupMode.set(getQuery().reduce((acc, esqArg) => {
+    popupMode.set(urlSearchParamsToArguments(getURLSearchParams()).reduce((acc, esqArg) => {
         return esqArg.name == '_burl0' ? true : acc;
     }, false));
     return Promise.resolve(ctx);
@@ -141,7 +143,8 @@ var routes = {
         },
         resetResult,
         setPopupMode,
-        getLoadDefinition(controls, definition, statement, getQuery, cache),
+        getLoadDefinition(cacheDefinition, definition),
+        getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect),
         hideResults,
     ]),
     '/:definitionName/request': promiseChain(errorHandler, [
@@ -151,7 +154,8 @@ var routes = {
         },
         resetResult,
         setPopupMode,
-        getLoadDefinition(controls, definition, statement, getQuery, cache),
+        getLoadDefinition(cacheDefinition, definition),
+        getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect),
         hideResults,
         createRequest,
     ]),
@@ -168,7 +172,8 @@ var routes = {
         resetResult,
         setPopupMode,
         hideResults,
-        getLoadDefinition(controls, definition, statement, getQuery, cache),
+        getLoadDefinition(cacheDefinition, definition),
+        getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect),
         waitForRequest,
     ]),
     '/:definitionName/result/:resultLocation': promiseChain(errorHandler, [
@@ -182,7 +187,8 @@ var routes = {
             });
         },
         setPopupMode,
-        getLoadDefinition(controls, definition, statement, getQuery, cache),
+        getLoadDefinition(cacheDefinition, definition),
+        getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect),
         loadResults,
     ]),
 };

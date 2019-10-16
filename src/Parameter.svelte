@@ -10,24 +10,33 @@ function runPopup() {
 let date = writable(0);
 let time = writable(0);
 
+let is_error = false
+
+function processDateTime(s) {
+  is_error = false;
+  try {
+    control.value = new Date(s).toISOString();
+  } catch (e) {
+    is_error = true;
+    control.value = new Date(s).toISOString();
+  }
+  if (parameter.type == 'date') {
+    control.value = control.value.replace(/T.*/, '');
+  }
+}
+
 if ((parameter.type == 'date') || (parameter.type == 'timestampz')) {
   const s = (control.value.indexOf('T') > -1) ? control.value : new Date().toISOString().replace(/T.*/, 'T09:00:00');
   date.set(s.replace(/T.*/, ''));
   time.set(s.replace(/.*T/, '').replace(/\..*/, ''));
 
   const dateUnsub = date.subscribe(value => {
-    control.value = new Date(value + 'T' + getStoreValue(time)).toISOString();
-    if (parameter.type == 'date') {
-      control.value = control.value.replace(/T.*/, '');
-    }
+    processDateTime(value + 'T' + getStoreValue(time));
   });
   onDestroy(dateUnsub);
 
   const timeUnsub = time.subscribe(value => {
-    control.value = new Date(getStoreValue(date) + 'T' + value).toISOString();
-    if (parameter.type == 'date') {
-      control.value = control.value.replace(/T.*/, '');
-    }
+    processDateTime(getStoreValue(date) + 'T' + value);
   });
   onDestroy(timeUnsub);
 
@@ -71,9 +80,9 @@ if ((parameter.type == 'date') || (parameter.type == 'timestampz')) {
   </button>
 </strong>
 {:else if (parameter.type == "timestampz") || (parameter.type == "date")}
-<input type="date" bind:value={$date}/>
+<input class={is_error ? "is-error" : ""} type="date" bind:value={$date}/>{control.value}
 {#if (parameter.type == "timestampz")}
-<input type="time" bind:value={$time}/>
+<input class={is_error ? "is-error" : ""} type="time" bind:value={$time}/>
 {/if}
 {:else}
   {#if ("" + control.value) != "" }
