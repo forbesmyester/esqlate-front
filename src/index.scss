@@ -126,3 +126,6 @@ div#main_links {
         color: #3b4351;
     }
 }
+input, select, .input-popup {
+    &.is-error { border-color: $error-color; }
+}

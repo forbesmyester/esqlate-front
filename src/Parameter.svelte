@@ -1,40 +1,10 @@
 <script>
-import { onDestroy } from 'svelte';
-import { get as getStoreValue, writable } from 'svelte/store';
+import ParameterDateOrTimestampz from "./ParameterDateOrTimestampz.svelte";
+import ParameterPopup from "./ParameterPopup.svelte";
 export let parameter;
 export let control;
 export let popup
 let is_error = false
-
-function processDateTime(s) {
-  is_error = false;
-  try {
-    control.value = new Date(s).toISOString();
-  } catch (e) {
-    is_error = true;
-    control.value = new Date(s).toISOString();
-  }
-  if (parameter.type == 'date') {
-    control.value = control.value.replace(/T.*/, '');
-  }
-}
-
-if ((parameter.type == 'date') || (parameter.type == 'timestampz')) {
-  const s = (control.value.indexOf('T') > -1) ? control.value : new Date().toISOString().replace(/T.*/, 'T09:00:00');
-  date.set(s.replace(/T.*/, ''));
-  time.set(s.replace(/.*T/, '').replace(/\..*/, ''));
-
-  const dateUnsub = date.subscribe(value => {
-    processDateTime(value + 'T' + getStoreValue(time));
-  });
-  onDestroy(dateUnsub);
-
-  const timeUnsub = time.subscribe(value => {
-    processDateTime(getStoreValue(date) + 'T' + value);
-  });
-  onDestroy(timeUnsub);
-
-}
 
 </script>
 
@@ -70,10 +40,7 @@ if ((parameter.type == 'date') || (parameter.type == 'timestampz')) {
 {:else if parameter.type == "popup"}
 <ParameterPopup popup={popup} control={control} parameter={parameter} />
 {:else if (parameter.type == "timestampz") || (parameter.type == "date")}
-<input class={is_error ? "is-error" : ""} type="date" bind:value={$date}/>{control.value}
-{#if (parameter.type == "timestampz")}
-<input class={is_error ? "is-error" : ""} type="time" bind:value={$time}/>
-{/if}
+<ParameterDateOrTimestampz control={control} parameter={parameter} />
 {:else}
   {#if ("" + control.value) != "" }
     <strong>{control.value}</strong>
