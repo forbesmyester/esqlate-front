@@ -2,7 +2,8 @@ import { getRequest, postRequest, errorHandler } from "../ts-src/io";
 import getCache from "esqlate-cache";
 import { getControlStore, urlSearchParamsToArguments } from "../ts-src/controls";
 import { get as getStoreValue, writable, Writable } from 'svelte/store';
-import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateArgument, EsqlateStatement, EsqlateCompleteResult, EsqlateResult } from "esqlate-lib";
+import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateStatement, EsqlateCompleteResult, EsqlateResult } from "esqlate-lib";
+import { EsqlateQueryComponent } from "../ts-src/types";
 import { Cache, Controls } from "../ts-src/types";
 
 import test from 'tape';
@@ -27,7 +28,7 @@ test('getLoadDefinition - simplist', (assert) => {
 
     const ctx = { params: { definitionName: "customer_search" } };
 
-    function resultDemand(definitionName: EsqlateDefinition["name"], _args: EsqlateArgument[]): Promise<EsqlateCompleteResult> {
+    function resultDemand(definitionName: EsqlateDefinition["name"], _args: EsqlateQueryComponent[]): Promise<EsqlateCompleteResult> {
         demandedResults.push(definitionName);
         const r: EsqlateCompleteResult = {
             status: "complete",

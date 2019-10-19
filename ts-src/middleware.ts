@@ -1,7 +1,7 @@
 import { getRequest, postRequest } from "./io";
 import { getControlStore, urlSearchParamsToArguments } from "./controls";
 import { get as getStoreValue, Writable } from 'svelte/store';
-import { EsqlateStatementNormalized, newlineBreak, normalize, EsqlateDefinition, EsqlateArgument, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter, EsqlateCompleteResult } from "esqlate-lib";
+import { EsqlateStatementNormalized, newlineBreak, normalize, EsqlateDefinition, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter, EsqlateCompleteResult } from "esqlate-lib";
 import { OptionsForEsqlateParameterSelect, Controls } from "./types";
 import { Cache } from "esqlate-cache";
 

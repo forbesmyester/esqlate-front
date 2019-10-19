@@ -23,7 +23,7 @@
   const unsub = controls.subscribe((controlValue) => {
     args = Object.getOwnPropertyNames(controlValue || {}).map(
       (name) => {
-        return { name: name, value: controlValue[name].value }
+        return { name: name, val: controlValue[name].value }
       }
     );
   });

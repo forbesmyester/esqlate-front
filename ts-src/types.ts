@@ -16,3 +16,7 @@ export interface Cache {
     selectResult: Cache<EsqlateCompleteResult>;
 }
 
+export interface EsqlateQueryComponent {
+  name: string;
+  val: number | string | number | boolean;
+}

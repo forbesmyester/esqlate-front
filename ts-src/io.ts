@@ -1,6 +1,5 @@
 import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
 import { URL } from "./types";
-import { EsqlateArgument } from 'esqlate-lib';
 
 export function getURLSearchParams(): URLSearchParams {
     return new URLSearchParams(window.location.hash.replace(/.*\?/, ''));

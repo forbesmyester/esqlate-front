@@ -1,5 +1,5 @@
 import { normalize, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateCompleteResult, EsqlateStatementNormalized, EsqlateParameterString } from "esqlate-lib";
-import { OptionsForEsqlateParameterSelect } from "./types";
+import { EsqlateQueryComponent, OptionsForEsqlateParameterSelect } from "./types";
 
 export type EsqlateLinkNormalized = {
     text: EsqlateStatementNormalized;
@@ -19,11 +19,11 @@ export interface ControlStore {
 }
 
 
-export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateArgument[] {
+export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateQueryComponent[] {
 
     let o = [];
     for (let [k, v] of url.entries()) {
-        o.push({ name: k, value: v});
+        o.push({ name: k, val: v});
     }
     return o;
 
@@ -33,25 +33,25 @@ export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateArgumen
 /**
  * Merges `esqArg` and `cs` with cs taking precedence.
  */
-export function addControlStoreToEsqlateArguments(cs: ControlStore, esqArg: EsqlateArgument[]): EsqlateArgument[] {
+export function addControlStoreToEsqlateQueryComponents(cs: ControlStore, esqArg: EsqlateQueryComponent[]): EsqlateQueryComponent[] {
     const fromCs: Set<String> = new Set(Object.getOwnPropertyNames(cs));
     return Object.getOwnPropertyNames(cs).reduce(
-        (acc: EsqlateArgument[], k: string) => {
-            return acc.concat([{ name: k, value: cs[k].value }]);
+        (acc: EsqlateQueryComponent[], k: string) => {
+            return acc.concat([{ name: k, val: cs[k].value }]);
         },
         esqArg.filter(({ name }) => !fromCs.has(name))
     );
 }
 
 export function getControlStore(
-    query: EsqlateArgument[],
+    query: EsqlateQueryComponent[],
     esqlateDefinitionParameters: EsqlateParameter[],
     optionsForSelect: OptionsForEsqlateParameterSelect[]
 ): ControlStore {
 
-   const inputValues: Map<string, EsqlateArgument["value"]> = query.reduce(
-        (acc, { name, value }: any) => {
-            acc.set(name, value);
+   const inputValues: Map<string, EsqlateQueryComponent["val"]> = query.reduce(
+        (acc, { name, val }: EsqlateQueryComponent) => {
+            acc.set(name, val);
             return acc;
         },
         new Map()
@@ -107,9 +107,9 @@ export function getControlStore(
 
 }
 
-export function serializeValues(values: EsqlateArgument[]) {
+export function serializeValues(values: EsqlateQueryComponent[]) {
     return values.map((ea) => {
-        return `${encodeURIComponent(ea.name)}=${encodeURIComponent(ea.value)}`;
+        return `${encodeURIComponent(ea.name)}=${encodeURIComponent(ea.val)}`;
     }).join('&');
 }
 
@@ -129,10 +129,10 @@ export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateL
 
 interface EsqlateRow { [k: string]: number | string | boolean; }
 
-export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"], args: EsqlateArgument[]): EsqlateRow {
+export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"], args: EsqlateQueryComponent[]): EsqlateRow {
     const argsAsOb = args.reduce(
         (acc, arg) => {
-            return {...acc, [arg.name]: arg.value };
+            return {...acc, [arg.name]: arg.val };
         },
         {}
     );
@@ -179,12 +179,12 @@ export function getLink(e: EsqlateLinkNormalized, row: EsqlateRow): EsqlateLinkF
 }
 
 
-export function addBackValuesToControlStore(qry: EsqlateArgument[], csv: ControlStore): ControlStore {
+export function addBackValuesToControlStore(qry: EsqlateQueryComponent[], csv: ControlStore): ControlStore {
     return qry.reduce(
-        (acc: ControlStore, esqArg: EsqlateArgument) => {
+        (acc: ControlStore, esqArg: EsqlateQueryComponent) => {
             const m = esqArg.name.match(/^_b[a-z]{1,9}([0-9]{1,3})/);
             if (!m) { return acc; }
-            return { ...acc, [m[0]]: { value: "" + esqArg.value } }
+            return { ...acc, [m[0]]: { value: "" + esqArg.val } }
         },
         csv
     );
@@ -193,12 +193,13 @@ export function addBackValuesToControlStore(qry: EsqlateArgument[], csv: Control
 
 type BackUrl = {
     url: string;
-    field: string; // Field to set upon return
+    fld: string; // Field to set upon return
     name: string; // The definition name
+    disp: string; // The name of the field to show in the input upon return
 }
 
 
-function getBackNumber(qry: EsqlateArgument[]): number {
+function getBackNumber(qry: EsqlateQueryComponent[]): number {
     return qry.reduce(
         (acc, esqArg) => {
             const m = esqArg.name.match(/^_burl([0-9]{1,3})/);
@@ -212,7 +213,7 @@ function getBackNumber(qry: EsqlateArgument[]): number {
     );
 }
 
-export function popBackFromArguments(qry: EsqlateArgument[]): BackUrl {
+export function popBackFromArguments(qry: EsqlateQueryComponent[]): BackUrl {
     const desiredNumber = getBackNumber(qry);
     if ((desiredNumber < 0)) {
         throw new Error("popBackFromArguments: No back links found")
@@ -222,11 +223,11 @@ export function popBackFromArguments(qry: EsqlateArgument[]): BackUrl {
             const m = esqArg.name.match(/^_b([a-z]{0,9})([0-9]{1,3})/);
             if (!m) { return acc; }
             if (parseInt(m[2]) == desiredNumber) {
-                return { ...acc, [m[1]]: decodeURIComponent(esqArg.value as string) }
+                return { ...acc, [m[1]]: decodeURIComponent(esqArg.val as string) }
             }
             return acc;
         },
-        { url: '', field: '', name: '' }
+        { url: '', fld: '', name: '', disp: ''  }
     );
 }
 
@@ -245,9 +246,35 @@ export function pushBackToControlStore(qry: ControlStore, url: BackUrl): Control
     );
     return {...qry,
         ["_burl" + (desiredNumber + 1)]: { value: url.url },
-        ["_bfield" + (desiredNumber + 1)]: { value: url.field },
-        ["_bname" + (desiredNumber + 1)]: { value: url.name }
+        ["_bfld" + (desiredNumber + 1)]: { value: url.fld },
+        ["_bname" + (desiredNumber + 1)]: { value: url.name },
+        ["_bdisp" + (desiredNumber + 1)]: { value: url.disp },
     };
+}
+
+export function queryComponentsToArguments(params: EsqlateDefinition["parameters"], queryComps: EsqlateQueryComponent[]): EsqlateArgument[] {
+
+    const popups: Set<string> = new Set(
+        params
+            .filter((p) => p.type == "popup")
+            .map((p) => p.name)
+    );
+
+    const mapper = (qc: EsqlateQueryComponent) => {
+        if (popups.has(qc.name)) {
+            const value = decodeURIComponent(
+                ("" + qc.val).replace(/ .*/, "")
+            );
+            return { name: qc.name, value };
+        }
+        return { name: qc.name, value: qc.val }
+    };
+
+    const filterer = (a: EsqlateArgument) => {
+        return a.name.substring(0, 1) !== "#"
+    }
+
+    return queryComps.map(mapper).filter(filterer);
 }
 
 // ControlStoreItem -> sql
@@ -259,7 +286,7 @@ export function pushBackToControlStore(qry: ControlStore, url: BackUrl): Control
 // getControlStore - only used in middleware, once
 // getQuery - massive use - takes querystring (or not} and converts to { name, value }[] - consider replacing for getURLSearchParams() in io 
 // popBackFromArguments - used twice takes getQuery result, removes highest back and returns url, move both into user-actions
-// addControlStoreToEsqlateArguments - always used with serializeValues except when posting for SQL - merges ControlStore and getQuery() with ControlStore taking precedence.
-// serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), getQuery()))
+// addControlStoreToEsqlateQueryComponents - always used with serializeValues except when posting for SQL - merges ControlStore and getQuery() with ControlStore taking precedence.
+// serializeValues(addControlStoreToEsqlateQueryComponents(getStoreValue(controls), getQuery()))
 // store -> display
 // display -> value

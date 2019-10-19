@@ -1,6 +1,7 @@
 import test from 'tape';
-import { getControlStore, normalizeLink, getLink, asRow, addBackValuesToControlStore, ControlStoreInputValue, popBackFromArguments, pushBackToControlStore, EsqlateLinkNormalized } from "../ts-src/controls";
-import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateArgument } from 'esqlate-lib';
+import { getControlStore, normalizeLink, getLink, asRow, addBackValuesToControlStore, ControlStoreInputValue, popBackFromArguments, pushBackToControlStore, EsqlateLinkNormalized, queryComponentsToArguments } from "../ts-src/controls";
+import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateDefinition, EsqlateArgument } from 'esqlate-lib';
+import { EsqlateQueryComponent } from '../ts-src/types';
 
 test("normalizeEsqlateLink", (assert) => {
 
@@ -62,7 +63,7 @@ test('asRow', (assert) => {
         asRow(
             ["hi", 4],
             [{name: "greeting", type: "string"}, {name: "age", type: "integer"}],
-            [{name: "gender", value: "F"}]
+            [{name: "gender", val: "F"}]
         ),
         { greeting: "hi", age: 4, gender: "F" }
     );
@@ -95,7 +96,7 @@ test('getControlStore', (assert) => {
 
     assert.deepEqual(
         getControlStore(
-            [{ name: "b", value: "four" }],
+            [{ name: "b", val: "four" }],
             [
                 { name: "a", type: "integer" } as EsqlateParameterInteger,
                 { name: "b", type: "string" } as EsqlateParameterString,
@@ -124,7 +125,7 @@ test('getControlStore a bug', (assert) => {
 
     assert.deepEqual(
         getControlStore(
-            [{ name: "b", value: 10881 }],
+            [{ name: "b", val: 10881 }],
             [{ name: "b", type: "integer" } as EsqlateParameterInteger],
             []
         ),
@@ -141,13 +142,15 @@ test("addBackValuesToControlStoreValue", (assert) => {
     };
 
     const inputQuery = [
-        { name: "c", value: "integer" } as EsqlateArgument,
-        { name: "_burl0", value: "bu1" } as EsqlateArgument,
-        { name: "_burl1", value: "bu2" } as EsqlateArgument,
-        { name: "_bname0", value: "bn1" } as EsqlateArgument,
-        { name: "_bname1", value: "bn2" } as EsqlateArgument,
-        { name: "_bfield0", value: "bf1" } as EsqlateArgument,
-        { name: "_bfield1", value: "bf2" } as EsqlateArgument,
+        { name: "c", val: "integer" } as EsqlateQueryComponent,
+        { name: "_burl0", val: "bu1" } as EsqlateQueryComponent,
+        { name: "_burl1", val: "bu2" } as EsqlateQueryComponent,
+        { name: "_bname0", val: "bn1" } as EsqlateQueryComponent,
+        { name: "_bname1", val: "bn2" } as EsqlateQueryComponent,
+        { name: "_bfld0", val: "bf1" } as EsqlateQueryComponent,
+        { name: "_bfld1", val: "bf2" } as EsqlateQueryComponent,
+        { name: "_bdisp0", val: "bd1" } as EsqlateQueryComponent,
+        { name: "_bdisp1", val: "bd2" } as EsqlateQueryComponent,
     ];
 
     const result = addBackValuesToControlStore(
@@ -162,8 +165,10 @@ test("addBackValuesToControlStoreValue", (assert) => {
         "_burl1": { value: "bu2" },
         "_bname0": { value: "bn1" },
         "_bname1": { value: "bn2" },
-        "_bfield0": { value: "bf1" },
-        "_bfield1": { value: "bf2" },
+        "_bfld0": { value: "bf1" },
+        "_bfld1": { value: "bf2" },
+        "_bdisp0": { value: "bd1" },
+        "_bdisp1": { value: "bd2" },
     };
 
     assert.deepEqual(
@@ -175,17 +180,19 @@ test("addBackValuesToControlStoreValue", (assert) => {
 
 test("popBackFromArguments", (assert) => {
     const inputQuery = [
-        { name: "c", value: "integer" } as EsqlateArgument,
-        { name: "_burl0", value: "bu1" } as EsqlateArgument,
-        { name: "_burl1", value: "%2Fbu2" } as EsqlateArgument,
-        { name: "_bname0", value: "bn1" } as EsqlateArgument,
-        { name: "_bname1", value: "bn2" } as EsqlateArgument,
-        { name: "_bfield0", value: "bf1" } as EsqlateArgument,
-        { name: "_bfield1", value: "bf2" } as EsqlateArgument,
+        { name: "c", val: "integer" } as EsqlateQueryComponent,
+        { name: "_burl0", val: "bu1" } as EsqlateQueryComponent,
+        { name: "_burl1", val: "%2Fbu2" } as EsqlateQueryComponent,
+        { name: "_bname0", val: "bn1" } as EsqlateQueryComponent,
+        { name: "_bname1", val: "bn2" } as EsqlateQueryComponent,
+        { name: "_bfld0", val: "bf1" } as EsqlateQueryComponent,
+        { name: "_bfld1", val: "bf2" } as EsqlateQueryComponent,
+        { name: "_bdips0", val: "bd1" } as EsqlateQueryComponent,
+        { name: "_bdisp1", val: "bd2" } as EsqlateQueryComponent,
     ];
     const result = popBackFromArguments(inputQuery);
 
-    assert.deepEqual(result, { name: "bn2", field: "bf2", url: "/bu2" });
+    assert.deepEqual(result, { name: "bn2", fld: "bf2", url: "/bu2", disp: "bd2" });
     assert.end();
 });
 
@@ -197,10 +204,12 @@ test("pushBackToControlStore", (assert) => {
         "_burl1": { value: "bu2" },
         "_bname0": { value: "bn1" },
         "_bname1": { value: "bn2" },
-        "_bfield0": { value: "bf1" },
-        "_bfield1": { value: "bf2" },
+        "_bfld0": { value: "bf1" },
+        "_bfld1": { value: "bf2" },
+        "_bdisp0": { value: "bd1" },
+        "_bdisp1": { value: "bd2" },
     };
-    const result = pushBackToControlStore(inputQuery, { name: "bn3", field: "bf3", url: "bu3" });
+    const result = pushBackToControlStore(inputQuery, { name: "bn3", fld: "bf3", url: "bu3", disp: "bd3" });
 
     assert.deepEqual(
         result,
@@ -212,12 +221,46 @@ test("pushBackToControlStore", (assert) => {
             "_bname0": { value: "bn1" },
             "_bname1": { value: "bn2" },
             "_bname2": { value: "bn3" },
-            "_bfield0": { value: "bf1" },
-            "_bfield1": { value: "bf2" },
-            "_bfield2": { value: "bf3" },
+            "_bfld0": { value: "bf1" },
+            "_bfld1": { value: "bf2" },
+            "_bfld2": { value: "bf3" },
+            "_bdisp0": { value: "bd1" },
+            "_bdisp1": { value: "bd2" },
+            "_bdisp2": { value: "bd3" },
         }
     );
     assert.end();
 });
 
 
+ test("queryComponentsToArguments", (assert) => {
+
+     const input:  EsqlateQueryComponent[] = [
+         { name: "search_string", val: "Hello Matt" },
+         { name: "company_id", val: "OCEAN%20BOB Ocean%20Shipping%20International" },
+         { name: "#hash", val: "abc123" }
+     ];
+
+     const parameters: EsqlateDefinition["parameters"] = [
+         {
+             name: "company_id",
+             type: "popup",
+             definition: "customer_country_count",
+             display_field: "display",
+             value_field: "country",
+         }
+     ];
+
+     const expected:  EsqlateArgument[] = [
+         { name: "search_string", value: "Hello Matt" },
+         { name: "company_id", value: "OCEAN BOB" }
+     ];
+
+     assert.deepEqual(
+         queryComponentsToArguments(parameters, input),
+         expected
+     );
+
+     assert.end();
+
+ });

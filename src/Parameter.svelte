@@ -4,12 +4,6 @@ import { get as getStoreValue, writable } from 'svelte/store';
 export let parameter;
 export let control;
 export let popup
-function runPopup() {
-  popup(this.innerText);
-}
-let date = writable(0);
-let time = writable(0);
-
 let is_error = false
 
 function processDateTime(s) {
@@ -74,11 +68,7 @@ if ((parameter.type == 'date') || (parameter.type == 'timestampz')) {
     {/if}
   {/if}
 {:else if parameter.type == "popup"}
-<strong>
-  <button class="input-popup" on:click={() => popup(parameter.name)}>
-    <div>{control.value}</div>&nbsp;⯅
-  </button>
-</strong>
+<ParameterPopup popup={popup} control={control} parameter={parameter} />
 {:else if (parameter.type == "timestampz") || (parameter.type == "date")}
 <input class={is_error ? "is-error" : ""} type="date" bind:value={$date}/>{control.value}
 {#if (parameter.type == "timestampz")}

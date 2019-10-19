@@ -2,11 +2,11 @@ import { get as getStoreValue, writable } from 'svelte/store';
 import App from './App.svelte';
 import { waitFor } from 'esqlate-waitfor';
 import { resultDemandHTTP, loadDefinitionHTTP, getInitilizeControls, getLoadDefinition } from "./middleware";
-import { addControlStoreToEsqlateArguments, popBackFromArguments, serializeValues, urlSearchParamsToArguments } from "./controls";
+import { addControlStoreToEsqlateQueryComponents, popBackFromArguments, serializeValues, queryComponentsToArguments, urlSearchParamsToArguments } from "./controls";
 import { getURLSearchParams, getRequest, postRequest, errorHandler } from "./io";
 import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
-import { pick as runPick, popup as runPopup } from "./user-actions";
+import { pick as runPick, getPopupLinkCreator } from "./user-actions";
 
 
 const controls = writable({});
@@ -25,28 +25,37 @@ getRequest("/")
 const cacheDefinition = getCache(loadDefinitionHTTP);
 const cacheCompleteResultForSelect = getCache(resultDemandHTTP);
 
-const cache = {
-    definition: getCache(loadDefinitionHTTP),
-    selectResult: getCache(resultDemandHTTP)
-};
-
 function popup(row) {
+    const runPopup = getPopupLinkCreator(getURLSearchParams);
     const route = runPopup(row, getStoreValue(definition), getStoreValue(controls));
     router.setRoute(route);
 }
 
 function pick(row) {
-    const route = runPick(row, urlSearchParamsToArguments(getURLSearchParams()), getStoreValue(result));
+    const route = runPick(
+        row,
+        urlSearchParamsToArguments(
+            getURLSearchParams()
+        ),
+        getStoreValue(result).fields
+    );
     router.setRoute(route);
 }
 
 function cancel() {
-    router.setRoute(popBackFromArguments(urlSearchParamsToArguments(getURLSearchParams())).url);
+    router.setRoute(popBackFromArguments(
+        urlSearchParamsToArguments(getURLSearchParams())
+    ).url);
 }
 
 function run() {
     const definitionName = getStoreValue(definition).name;
-    const qs = serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())));
+    const qs = serializeValues(
+        addControlStoreToEsqlateQueryComponents(
+            getStoreValue(controls),
+            urlSearchParamsToArguments(getURLSearchParams())
+        )
+    );
     const route = `/${encodeURIComponent(definitionName)}/request?${qs}`
     router.setRoute(route);
 }
@@ -76,14 +85,26 @@ function hideResults(ctx) {
 
 
 function createRequest(ctx) {
-    const data = { "arguments": addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())) };
+
+    const data = {
+        "arguments": queryComponentsToArguments(
+            getStoreValue(definition).parameters,
+            addControlStoreToEsqlateQueryComponents(
+                getStoreValue(controls),
+                urlSearchParamsToArguments(
+                    getURLSearchParams()
+                )
+            )
+        )
+    };
+
     const url = `/request/${ctx.params.definitionName}`;
 
     // TODO: Catch 422 etc
     return postRequest(url, data)
         .then(resp => resp.json())
         .then((json) => {
-            const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
+            const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${serializeValues(addControlStoreToEsqlateQueryComponents(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
             router.setRoute(url);
             return ctx;
         });
@@ -107,7 +128,7 @@ function waitForRequest(ctx) {
 
     return waitFor(getReady, calculateNewDelay)
         .then((loc) => {
-            const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(addControlStoreToEsqlateArguments(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
+            const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(addControlStoreToEsqlateQueryComponents(getStoreValue(controls), urlSearchParamsToArguments(getURLSearchParams())))}`;
             router.setRoute(url);
             return ctx;
         });
