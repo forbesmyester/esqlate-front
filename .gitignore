@@ -8,6 +8,7 @@ package-lock.json
 /src/getFullUrlFromResponseUrl.js
 /src/io.js
 /src/types.js
+/src/ui.js
 /ts-build
 /lighttpd.conf
 /public

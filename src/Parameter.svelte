@@ -1,6 +1,7 @@
 <script>
 import ParameterDateOrTimestampz from "./ParameterDateOrTimestampz.svelte";
 import ParameterPopup from "./ParameterPopup.svelte";
+import { getStep } from "./ui";
 export let parameter;
 export let control;
 export let popup
@@ -21,6 +22,8 @@ let is_error = false
   <input id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
 {:else if parameter.type == "integer"}
   <input id={ "input-" + parameter.name } name={parameter.name} type="number" bind:value={control.value}>
+{:else if parameter.type == "decimal"}
+  <input id={ "input-" + parameter.name } step={getStep(parameter.decimal_places)} name={parameter.name} type="number" bind:value={control.value}>
 {:else if parameter.type == "server"}
   ${parameter.name}
 {:else if parameter.type == "select"}
