@@ -17,7 +17,7 @@ const definition = writable({ statement: [ ] });
 const variables = [ ];
 const menu = writable([]);
 
-getRequest("/")
+getRequest("/definition")
     .then(resp => resp.json())
     .then((j) => { menu.set(j); });
 
