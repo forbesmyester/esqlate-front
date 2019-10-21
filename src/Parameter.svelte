@@ -8,6 +8,8 @@
   export let popup;
   export let onfocus;
   export let onblur;
+  export let onerror;
+  export let onfix;
   let is_error = false
 
 </script>
@@ -22,16 +24,16 @@
 {/if}
 
 {#if parameter.type == "string"}
-  <input data-field={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} bind:value={control.value}>
 {:else if parameter.type == "integer"}
-  <input data-field={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} type="number" bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} type="number" bind:value={control.value}>
 {:else if parameter.type == "decimal"}
-  <input data-field={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} step={getStep(parameter.decimal_places)} name={parameter.name} type="number" bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} step={getStep(parameter.decimal_places)} name={parameter.name} type="number" bind:value={control.value}>
 {:else if parameter.type == "server"}
   ${parameter.name}
 {:else if parameter.type == "select"}
   {#if control.options }
-    <select data-field={JSON.stringify(parameter.highlight_fields)} on:focus={onfocus} on:blur={onblur} id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
+    <select data-highlight-fields={JSON.stringify(parameter.highlight_fields)} on:focus={onfocus} on:blur={onblur} id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value}>
       {#each control.options as opt}
         <option value={opt.value}>{opt.display}</option>
       {/each}
@@ -46,7 +48,7 @@
 {:else if parameter.type == "popup"}
 <ParameterPopup popup={popup} control={control} parameter={parameter} />
 {:else if (parameter.type == "datetime") || (parameter.type == "date")}
-<ParameterDateOrDatetime onfocus={onfocus} onblur={onblur} control={control} parameter={parameter} />
+<ParameterDateOrDatetime onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} control={control} parameter={parameter} />
 {:else}
   {#if ("" + control.value) != "" }
     <strong>{control.value}</strong>

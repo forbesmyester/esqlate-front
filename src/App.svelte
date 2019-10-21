@@ -35,13 +35,13 @@
   function showSidebar() { sidebarActive = true; }
   function hideSidebar() { sidebarActive = false; }
 
-  function resetStylesheet() {
+  function resetStylesheet(name) {
 
-    let styleEl = document.getElementById("onblur-onfocus-style");
+    let styleEl = document.getElementById(name);
     if (!styleEl) {
       const head = document.head || document.getElementsByTagName('head')[0];
       styleEl = document.createElement('style');
-      styleEl.id = "onblur-onfocus-style";
+      styleEl.id = name;
       head.appendChild(styleEl);
     }
     for (let i = 0; i < styleEl.sheet.rules.length; i++) {
@@ -51,9 +51,9 @@
   }
 
   function onfocus({target}) {
-    const stylesheet = resetStylesheet();
+    const stylesheet = resetStylesheet("onblur-onfocus-style");
     try {
-      const flds = JSON.parse(target && target.dataset && target.dataset.field || "[]");
+      const flds = JSON.parse(target && target.dataset && target.dataset.highlightFields || "[]");
       flds.forEach((fld) => {
         stylesheet.insertRule(`.field_highlight[data-field="${fld}"] { font-weight: bold; color: black; }`);
       });
@@ -61,7 +61,37 @@
   }
 
   function onblur({target}) {
-    resetStylesheet();
+    resetStylesheet("onblur-onfocus-style");
+  }
+
+  let errorFields = new Map();
+
+  function redrawErrorStylesheet() {
+    const stylesheet = resetStylesheet("onerror");
+    const allErrors = new Set();
+    for (const [name, set] of errorFields) {
+      for (const s of set) {
+        allErrors.add(s);
+      }
+    }
+    for (const errorField of allErrors) {
+      stylesheet.insertRule(`.field_highlight[data-field="${errorField}"] { color: red !important; }`);
+    }
+  }
+
+  function onerror(name, highlightFields) {
+    if (!errorFields.has(name)) { errorFields.set(name, new Set()); }
+    highlightFields.forEach((hf) => {
+      errorFields.get(name).add(hf);
+    });
+    redrawErrorStylesheet();
+  }
+
+  function onfix(name, highlightFields) {
+    highlightFields.forEach((hf) => {
+      errorFields.get(name) && errorFields.get(name).delete(hf);
+    });
+    redrawErrorStylesheet();
   }
 
 
@@ -141,7 +171,7 @@
               {#if typeof item == "string"}
               <Highlighter parameters={$definition.parameters} item={item}/>
               {:else}
-              <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[item.name]} parameter={item}/>
+              <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[item.name]} parameter={item}/>
               {/if}
               {/each}
             </div>
@@ -164,10 +194,10 @@
           <div class="column col-7 col-sm-12">
             {#if parameter.type == "static"}
             <label class="form-label" >
-            <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             </label>
             {:else}
-            <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             {/if}
           </div>
         </div>

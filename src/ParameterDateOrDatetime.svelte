@@ -7,6 +7,8 @@ export let parameter;
 export let control;
 export let onblur;
 export let onfocus;
+export let onerror;
+export let onfix;
 
 let date = writable(0);
 let time = writable(0);
@@ -23,8 +25,10 @@ function registerHandlers() {
     is_error = false;
     try {
       control.value = processDateTime(parameter.type, value);
+      onfix(parameter.name, parameter.highlight_fields)
     } catch (e) {
       is_error = true;
+      onerror(parameter.name, parameter.highlight_fields)
     }
   });
   onDestroy(dateUnsub);
@@ -33,8 +37,10 @@ function registerHandlers() {
     is_error = false;
     try {
       control.value = processDateTime(parameter.type, getStoreValue(date) + 'T' + value);
+      onfix(parameter.name, parameter.highlight_fields)
     } catch (e) {
       is_error = true;
+      onerror(parameter.name, parameter.highlight_fields)
     }
   });
   onDestroy(timeUnsub);
@@ -44,15 +50,15 @@ initializeValue();
 registerHandlers();
 
 </script>
-<input data-field={JSON.stringify(parameter.highlight_fields)}
+<input data-highlight-fields={JSON.stringify(parameter.highlight_fields)}
        on:focus={onfocus}
        on:blur={onblur}
        id={ "input-" + parameter.name }
        class={is_error ? "is-error" : ""}
        type="date"
-       bind:value={$date}/>
+       bind:value={$date}/>{is_error}
 {#if (parameter.type == "datetime")}
-<input data-field={JSON.stringify(parameter.highlight_fields)}
+<input data-highlight-fields={JSON.stringify(parameter.highlight_fields)}
        on:focus={onfocus}
        on:blur={onblur}
        id={ "input-" + parameter.name }
