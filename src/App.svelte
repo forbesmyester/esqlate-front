@@ -1,9 +1,11 @@
 <script>
 
+  import { getHightlightPositions, getHightlightString } from './ui';
   import { onDestroy } from 'svelte';
   import { get as getStoreValue } from 'svelte/store';
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
+  import Highlighter from "./Highlighter.svelte";
 
   export let pick;
   export let result;
@@ -20,14 +22,14 @@
   let md = new window.markdownit();
 
   let args = [];
-  const unsub = controls.subscribe((controlValue) => {
+  const unsubControls = controls.subscribe((controlValue) => {
     args = Object.getOwnPropertyNames(controlValue || {}).map(
       (name) => {
         return { name: name, val: controlValue[name].value }
       }
     );
   });
-  onDestroy(unsub);
+  onDestroy(unsubControls);
 
   let sidebarActive = false;
   function showSidebar() { sidebarActive = true; }
@@ -104,7 +106,7 @@
       <div class="container"><div class="col-gapless columns">
           <div class="code-code column col-12" id="code-input-area">
             {#each $statement as line}
-            <div class="line">{#each line as item}{#if typeof item == "string"}<span>{item}</span>{:else}<Parameter popup={popup} bind:control={$controls[item.name]} parameter={item}/>{/if}{/each}
+            <div class="line">{#each line as item}{#if typeof item == "string"}<Highlighter definition={definition} item={item}/>{:else}<Parameter popup={popup} bind:control={$controls[item.name]} parameter={item}/>{/if}{/each}
             </div>
             {/each}
           </div>
