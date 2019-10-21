@@ -1,5 +1,5 @@
 import test from 'tape';
-import { getStep } from '../ts-src/ui';
+import { processDateTime, getStep } from '../ts-src/ui';
 
 test("getStep", (assert) => {
     assert.is(getStep(2), "0.01");
@@ -12,3 +12,10 @@ test("getStep", (assert) => {
     assert.end();
 });
 
+
+test("processDateTime", (assert) => {
+    assert.is(processDateTime("date", '1990-10-21'), '1990-10-21');
+    assert.is(processDateTime("date", '1990-10-21T11:44:22'), '1990-10-21');
+    assert.is(processDateTime("datetime", '1990-10-21T11:44:22.000Z'), '1990-10-21T11:44:22.000Z');
+    assert.end();
+});

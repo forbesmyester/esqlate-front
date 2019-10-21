@@ -1,5 +1,5 @@
 <script>
-import ParameterDateOrTimestampz from "./ParameterDateOrTimestampz.svelte";
+import ParameterDateOrDatetime from "./ParameterDateOrDatetime.svelte";
 import ParameterPopup from "./ParameterPopup.svelte";
 import { getStep } from "./ui";
 export let parameter;
@@ -42,8 +42,8 @@ let is_error = false
   {/if}
 {:else if parameter.type == "popup"}
 <ParameterPopup popup={popup} control={control} parameter={parameter} />
-{:else if (parameter.type == "timestampz") || (parameter.type == "date")}
-<ParameterDateOrTimestampz control={control} parameter={parameter} />
+{:else if (parameter.type == "datetime") || (parameter.type == "date")}
+<ParameterDateOrDatetime control={control} parameter={parameter} />
 {:else}
   {#if ("" + control.value) != "" }
     <strong>{control.value}</strong>
