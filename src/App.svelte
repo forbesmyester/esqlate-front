@@ -35,6 +35,36 @@
   function showSidebar() { sidebarActive = true; }
   function hideSidebar() { sidebarActive = false; }
 
+  function resetStylesheet() {
+
+    let styleEl = document.getElementById("onblur-onfocus-style");
+    if (!styleEl) {
+      const head = document.head || document.getElementsByTagName('head')[0];
+      styleEl = document.createElement('style');
+      styleEl.id = "onblur-onfocus-style";
+      head.appendChild(styleEl);
+    }
+    for (let i = 0; i < styleEl.sheet.rules.length; i++) {
+      styleEl.sheet.removeRule(0);
+    }
+    return styleEl.sheet;
+  }
+
+  function onfocus({target}) {
+    const stylesheet = resetStylesheet();
+    try {
+      const flds = JSON.parse(target && target.dataset && target.dataset.field || "[]");
+      flds.forEach((fld) => {
+        stylesheet.insertRule(`.field_highlight[data-field="${fld}"] { font-weight: bold; color: black; }`);
+      });
+    } catch (e) {}
+  }
+
+  function onblur({target}) {
+    resetStylesheet();
+  }
+
+
 </script>
 
 <div class="off-canvas">
@@ -106,7 +136,14 @@
       <div class="container"><div class="col-gapless columns">
           <div class="code-code column col-12" id="code-input-area">
             {#each $statement as line}
-            <div class="line">{#each line as item}{#if typeof item == "string"}<Highlighter definition={definition} item={item}/>{:else}<Parameter popup={popup} bind:control={$controls[item.name]} parameter={item}/>{/if}{/each}
+            <div class="line">
+              {#each line as item}
+              {#if typeof item == "string"}
+              <Highlighter parameters={$definition.parameters} item={item}/>
+              {:else}
+              <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[item.name]} parameter={item}/>
+              {/if}
+              {/each}
             </div>
             {/each}
           </div>
@@ -127,10 +164,10 @@
           <div class="column col-7 col-sm-12">
             {#if parameter.type == "static"}
             <label class="form-label" >
-            <Parameter popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             </label>
             {:else}
-            <Parameter popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             {/if}
           </div>
         </div>

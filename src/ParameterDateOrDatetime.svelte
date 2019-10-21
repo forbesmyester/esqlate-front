@@ -5,6 +5,8 @@ import { get as getStoreValue, writable } from 'svelte/store';
 
 export let parameter;
 export let control;
+export let onblur;
+export let onfocus;
 
 let date = writable(0);
 let time = writable(0);
@@ -42,12 +44,18 @@ initializeValue();
 registerHandlers();
 
 </script>
-<input id={ "input-" + parameter.name }
+<input data-field={JSON.stringify(parameter.highlight_fields)}
+       on:focus={onfocus}
+       on:blur={onblur}
+       id={ "input-" + parameter.name }
        class={is_error ? "is-error" : ""}
        type="date"
        bind:value={$date}/>
 {#if (parameter.type == "datetime")}
-<input id={ "input-" + parameter.name }
+<input data-field={JSON.stringify(parameter.highlight_fields)}
+       on:focus={onfocus}
+       on:blur={onblur}
+       id={ "input-" + parameter.name }
        class={is_error ? "is-error" : ""}
        type="time"
        bind:value={$time}/>

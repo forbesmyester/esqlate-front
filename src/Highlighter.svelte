@@ -1,18 +1,22 @@
 <script>
-  import { onDestroy } from 'svelte';
   import { getHightlightPositions, getHightlightString } from './ui';
 
   export let item;
-  export let definition;
+  export let parameters;
 
-  let parameterNames = [];
-
-  const unsub = definition.subscribe((def) => {
-    parameterNames = def.parameters.map(({highlight_field}) => highlight_field);
-  });
-  onDestroy(unsub);
-
-  const parts = getHightlightString(getHightlightPositions(parameterNames, item), item);
+  function getParts(params, theItem) {
+    const parameterNames = Array.from(new Set(params.reduce(
+      (acc, {highlight_fields}) => acc.concat(highlight_fields || []),
+      []
+    )));
+    return getHightlightString(getHightlightPositions(parameterNames, theItem), theItem);
+  }
 
 </script>
-{#each parts as part}{#if part.type == "String"}<span>{part.value}</span>{:else}<span class="field_highlight" data-field={part.value}>{part.value}</span>{/if}{/each}
+{#each getParts(parameters, item) as part}
+{#if part.type == "String"}
+<span>{part.value}</span>
+{:else}
+<span class="field_highlight" data-field={part.value}>{part.value}</span>
+{/if}
+{/each}
