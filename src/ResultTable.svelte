@@ -95,8 +95,8 @@
     return "right";
   }
 
-  const dateFormatter = new Intl.DateTimeFormat(window.navigator.language, { year: 'numeric', month: 'long', day: '2-digit' });
-  const timestampFormatter = new Intl.DateTimeFormat(window.navigator.language, { hour: 'numeric', minute: 'numeric', second: 'numeric', year: 'numeric', month: 'long', day: '2-digit' });
+  const dateFormatter = new Intl.DateTimeFormat(window.navigator.language, { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const timestampFormatter = new Intl.DateTimeFormat(window.navigator.language, { hour: 'numeric', minute: 'numeric', second: 'numeric', year: 'numeric', month: '2-digit', day: '2-digit' });
   const formatters = {
     "date": (s) => dateFormatter.format(new Date(s)),
     "timestamp": (s) => timestampFormatter.format(new Date(s)),
