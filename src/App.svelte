@@ -81,14 +81,14 @@
 
   function onerror(name, highlightFields) {
     if (!errorFields.has(name)) { errorFields.set(name, new Set()); }
-    highlightFields.forEach((hf) => {
+    (highlightFields || [name]).forEach((hf) => {
       errorFields.get(name).add(hf);
     });
     redrawErrorStylesheet();
   }
 
   function onfix(name, highlightFields) {
-    highlightFields.forEach((hf) => {
+    (highlightFields || []name).forEach((hf) => {
       errorFields.get(name) && errorFields.get(name).delete(hf);
     });
     redrawErrorStylesheet();
