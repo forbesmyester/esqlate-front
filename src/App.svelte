@@ -107,7 +107,7 @@
   </a>
 
   <div id="sidebar-id" class={ sidebarActive ? "off-canvas-sidebar active" : "off-canvas-sidebar" }>
-    <div id="logo">eSQLate</div>
+    <div id="logo">Esqlate</div>
     <ul>
       {#each $menu as item}
       <li>
