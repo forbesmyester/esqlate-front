@@ -88,7 +88,7 @@
   }
 
   function onfix(name, highlightFields) {
-    (highlightFields || []name).forEach((hf) => {
+    (highlightFields || [name]).forEach((hf) => {
       errorFields.get(name) && errorFields.get(name).delete(hf);
     });
     redrawErrorStylesheet();

@@ -12,6 +12,26 @@
   export let onfix;
   let is_error = false
 
+  function isIntegerOk() {
+    if ("" + parseInt(control.value) != control.value) {
+      is_error = true;
+      return onerror(parameter.name, parameter.highlight_fields);
+    }
+    is_error = false;
+    return onfix(parameter.name, parameter.highlight_fields);
+  }
+
+  function isDecimalOk() {
+    if (("" + control.value).match(/^-?(0|[1-9]\d*)(\.\d+)?$/)) {
+      is_error = false;
+      return onfix(parameter.name, parameter.highlight_fields);
+    }
+    is_error = true;
+    return onerror(parameter.name, parameter.highlight_fields);
+  }
+
+  if (parameter.type == "integer") { isIntegerOk(); }
+  if (parameter.type == "decimal") { isDecimalOk(); }
 </script>
 
 {#if parameter.type != "server"}
@@ -24,11 +44,11 @@
 {/if}
 
 {#if parameter.type == "string"}
-  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} bind:value={control.value} class={is_error ? "is-error" : ""}>
 {:else if parameter.type == "integer"}
-  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} type="number" bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} name={parameter.name} type="number" bind:value={control.value} on:change={isIntegerOk}>
 {:else if parameter.type == "decimal"}
-  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} step={getStep(parameter.decimal_places)} name={parameter.name} type="number" bind:value={control.value}>
+  <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)} id={ "input-" + parameter.name } on:focus={onfocus} on:blur={onblur} step={getStep(parameter.decimal_places)} name={parameter.name} type="number" bind:value={control.value} on:change={isDecimalOk} class={is_error ? "is-error" : ""}>
 {:else if parameter.type == "server"}
   ${parameter.name}
 {:else if parameter.type == "select"}
