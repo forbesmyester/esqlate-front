@@ -24,15 +24,7 @@ export interface ControlStoreDateValueNormalized {
     time: string;
 }
 
-export function initializeDateTime(isoTimeString: string): ControlStoreDateValueNormalized {
-    const date = isoTimeString.replace(/T.*/, '');
-    const time = isoTimeString.replace(/.*T/, '');
-    return { value: isoTimeString, date, time };
-}
-
-
-export function processDateTime(control: ControlStoreDateValue) {
-
+export function initializeDateTime(control: ControlStoreDateValue): ControlStoreDateValueNormalized {
     const indexOfT = control.value.indexOf('T');
 
     const date = control.date ?
@@ -46,6 +38,31 @@ export function processDateTime(control: ControlStoreDateValue) {
         indexOfT > -1 ?
             control.value.substring(indexOfT + 1) :
             "";
+
+    return { value: (date && time) ? date + 'T' + time : '', date, time };
+}
+
+
+export enum ProcessDateTimeWhich {
+    DATE = "DATE",
+    TIME = "TIME",
+}
+
+
+export function processDateTime(control: ControlStoreDateValue, which: ProcessDateTimeWhich): ControlStoreDateValueNormalized {
+
+    const indexOfT = control.value.indexOf('T');
+
+    let date = control.value.substring(0, indexOfT);
+    let time = control.value.substring(indexOfT + 1);
+
+    if ((!date) || (which == ProcessDateTimeWhich.DATE)) {
+        date = control.date || "";
+    }
+
+    if ((!time) || (which == ProcessDateTimeWhich.TIME)) {
+        time = control.time || "";
+    }
 
     return { value: (date && time) ? date + 'T' + time : '', date, time };
 

@@ -14,18 +14,9 @@ export let onfix;
 
 const dispatchNewValue = createEventDispatcher();
 
-let date = writable(0);
-let time = writable(0);
-
-function initializeValue() {
-  date.set(control.value.replace(/T.*/, ''));
-  time.set(control.value.replace(/.*T/, '').replace(/\..*/, ''));
-}
-
-
 function onchangedate({ target: { value: evtValue} }) {
     try {
-      control = processDateTime({ ...control, date: evtValue });
+      control = processDateTime({ ...control, date: evtValue }, "DATE");
       dispatchNewValue("newvalue", { name: parameter.name, control });
       control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
     } catch (e) {
@@ -35,7 +26,7 @@ function onchangedate({ target: { value: evtValue} }) {
 
 function onchangetime({ target: { value: evtValue } }) {
     try {
-      control = {...processDateTime({ ...control, time: evtValue })};
+      control = {...processDateTime({ ...control, time: evtValue }, "TIME")};
       dispatchNewValue("newvalue", { name: parameter.name, control });
       control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
     } catch (e) {
@@ -43,7 +34,8 @@ function onchangetime({ target: { value: evtValue } }) {
     }
 }
 
-control = initializeDateTime(control.value);
+console.log("B", control.value);
+console.log("E", control.value);
 control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
 
 </script>
@@ -54,7 +46,7 @@ control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerr
        data-parameter-name={parameter.name}
        type="date"
        on:change={onchangedate}
-       value={control.date || ""}/>
+       value={initializeDateTime(control).date || ""}/>
 <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)}
        on:focus={onfocus}
        on:blur={onblur}
@@ -62,4 +54,4 @@ control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerr
        data-parameter-name={parameter.name}
        type="time"
        on:change={onchangetime}
-       value={control.time || ""}/>
+       value={initializeDateTime(control).time || ""}/>

@@ -1,5 +1,5 @@
 import test from 'tape';
-import { initializeDateTime, processDateTime, getStep, getHightlightPositions, getHightlightString, LineType } from '../ts-src/ui';
+import { initializeDateTime, processDateTime, getStep, getHightlightPositions, getHightlightString, LineType, ProcessDateTimeWhich } from '../ts-src/ui';
 
 test("getStep", (assert) => {
     assert.is(getStep(2), "0.01");
@@ -13,9 +13,9 @@ test("getStep", (assert) => {
 });
 
 
-test("processDateTime Empty", (assert) => {
+test("initializeDateTime Empty", (assert) => {
     assert.deepEqual(
-        processDateTime({ value: '', date: '', time: ''}),
+        initializeDateTime({ value: '', date: '', time: ''}),
         {
             value: '',
             date: '',
@@ -25,9 +25,9 @@ test("processDateTime Empty", (assert) => {
     assert.end();
 });
 
-test("processDateTime Happy", (assert) => {
+test("initializeDateTime Happy", (assert) => {
     assert.deepEqual(
-        processDateTime({ value: '1990-10-21T11:44:22.000Z', date: '1992-10-21', time: '09:44:22.000Z'}),
+        initializeDateTime({ value: '1990-10-21T11:44:22.000Z', date: '1992-10-21', time: '09:44:22.000Z'}),
         {
             value: '1992-10-21T09:44:22.000Z',
             date: '1992-10-21',
@@ -37,21 +37,57 @@ test("processDateTime Happy", (assert) => {
     assert.end();
 });
 
-test("initializeDateTime", (assert) => {
+test("processDateTime When both specified", (assert) => {
     assert.deepEqual(
-        initializeDateTime(""),
-        { value: "", time: "", date: "" }
-    );
-    assert.deepEqual(
-        initializeDateTime("1990-10-21T11:44:22.000Z"),
+        processDateTime({ value: '', date: '1990-10-21', time: '09:44:22.000Z'}, ProcessDateTimeWhich.TIME),
         {
-            value: "1990-10-21T11:44:22.000Z",
-            time: "11:44:22.000Z",
-            date: "1990-10-21"
+            value: '1990-10-21T09:44:22.000Z',
+            date: '1990-10-21',
+            time: '09:44:22.000Z'
+        },
+    );
+    assert.end();
+});
+
+test("processDateTime Time", (assert) => {
+    assert.deepEqual(
+        processDateTime({ value: '1990-10-21T11:44:22.000Z', date: '1992-10-21', time: '09:44:22.000Z'}, ProcessDateTimeWhich.TIME),
+        {
+            value: '1990-10-21T09:44:22.000Z',
+            date: '1990-10-21',
+            time: '09:44:22.000Z'
         }
     );
     assert.end();
 });
+
+test("processDateTime Date", (assert) => {
+    assert.deepEqual(
+        processDateTime({ value: '1990-10-21T11:44:22.000Z', date: '1992-10-21', time: '09:44:22.000Z'}, ProcessDateTimeWhich.DATE),
+        {
+            value: '1992-10-21T11:44:22.000Z',
+            date: '1992-10-21',
+            time: '11:44:22.000Z'
+        }
+    );
+    assert.end();
+});
+
+// test("initializeDateTime", (assert) => {
+//     assert.deepEqual(
+//         initializeDateTime(""),
+//         { value: "", time: "", date: "" }
+//     );
+//     assert.deepEqual(
+//         initializeDateTime("1990-10-21T11:44:22.000Z"),
+//         {
+//             value: "1990-10-21T11:44:22.000Z",
+//             time: "11:44:22.000Z",
+//             date: "1990-10-21"
+//         }
+//     );
+//     assert.end();
+// });
 
 test('getHightlightPositions', (assert) => {
     assert.deepEqual(
