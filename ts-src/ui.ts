@@ -12,25 +12,52 @@ export function getStep(decimalPlaceCount: any) {
   return "1";
 }
 
-
-export function processDateTime(paramType: string, s: string) {
-    let r = '';
-    const ss = paramType == "date" ?
-        (s.replace(/T.*/, '') + 'T09:00:00') :
-        s;
-    r = new Date(ss).toISOString();
-    if (paramType == 'date') {
-        return r.replace(/T.*/, '');
-    }
-    return r;
+export interface ControlStoreDateValue {
+    value: string;
+    date?: string;
+    time?: string;
 }
+
+export interface ControlStoreDateValueNormalized {
+    value: string;
+    date: string;
+    time: string;
+}
+
+export function initializeDateTime(isoTimeString: string): ControlStoreDateValueNormalized {
+    const date = isoTimeString.replace(/T.*/, '');
+    const time = isoTimeString.replace(/.*T/, '');
+    return { value: isoTimeString, date, time };
+}
+
+
+export function processDateTime(control: ControlStoreDateValue) {
+
+    const indexOfT = control.value.indexOf('T');
+
+    const date = control.date ?
+        control.date :
+        indexOfT > -1 ?
+            control.value.substring(0, indexOfT) :
+            "";
+
+    const time = control.time ?
+        control.time :
+        indexOfT > -1 ?
+            control.value.substring(indexOfT + 1) :
+            "";
+
+    return { value: (date && time) ? date + 'T' + time : '', date, time };
+
+}
+
 
 export interface HighlightPosition {
     begin: number;
     end: number;
 }
 
-export function getHightlightPositions(params: EsqlateParameter["highlight_field"][], bitOfSql: string): HighlightPosition[] {
+export function getHightlightPositions(params: EsqlateParameter["highlight_fields"], bitOfSql: string): HighlightPosition[] {
 
     function findAll(s: string, substring: string) {
         let lastPos = 0;
@@ -46,7 +73,7 @@ export function getHightlightPositions(params: EsqlateParameter["highlight_field
             });
     }
 
-    return params.filter((p) => p !== undefined).reduce(
+    return (params || []).filter((p) => p !== undefined).reduce(
         (acc: HighlightPosition[], param) => {
             return acc.concat(findAll(bitOfSql, "" + param));
         },

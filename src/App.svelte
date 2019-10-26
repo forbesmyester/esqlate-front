@@ -18,6 +18,17 @@
   export let popupMode;
   export let menu;
 
+  let getColorCache = new Map();
+
+  function getColor(s) {
+    if (getColorCache.has(s)) { return getColorCache.get(s); };
+    let r = Array.from(document.querySelectorAll(`#color-finder-${s}`)).reduce((acc, el) => {
+      return window.getComputedStyle(el).color;
+    }, null);
+    if (r != null) { getColorCache.set(s, r); }
+    return r;
+  }
+
   let showingSql = true;
   let md = new window.markdownit();
 
@@ -44,7 +55,7 @@
       styleEl.id = name;
       head.appendChild(styleEl);
     }
-    for (let i = 0; i < styleEl.sheet.rules.length; i++) {
+    while (styleEl.sheet.rules.length > 0) {
       styleEl.sheet.removeRule(0);
     }
     return styleEl.sheet;
@@ -70,16 +81,24 @@
     const stylesheet = resetStylesheet("onerror");
     const allErrors = new Set();
     for (const [name, set] of errorFields) {
+      let addedError = false;
       for (const s of set) {
         allErrors.add(s);
+        if (!addedError) {
+          stylesheet.insertRule(
+            `.input-popup[data-parameter-name="${name}"], input[data-parameter-name="${name}"], select[data-parameter-name="${name}"] { border-color:${getColor('error')} !important; }`
+          );
+          addedError = true;
+        }
       }
     }
     for (const errorField of allErrors) {
-      stylesheet.insertRule(`.field_highlight[data-field="${errorField}"] { color: red !important; }`);
+      stylesheet.insertRule(`.field_highlight[data-field="${errorField}"] { color: ${getColor('error')} !important; }`);
     }
   }
 
   function onerror(name, highlightFields) {
+
     if (!errorFields.has(name)) { errorFields.set(name, new Set()); }
     (highlightFields || [name]).forEach((hf) => {
       errorFields.get(name).add(hf);
@@ -94,6 +113,11 @@
     redrawErrorStylesheet();
   }
 
+  function onnewcontrolvalue({detail: { name, control } }) {
+    controls.update((cont) => {
+      return { ...cont, [name]: { ...control } };
+    });
+  }
 
 </script>
 
@@ -135,6 +159,7 @@
           { $result.message }
         </div>
       </div>
+      });
     </div>
   </div>
 {/if}
@@ -148,9 +173,7 @@
     <div class="modal-header">
       <div class="container"><div class="columns">
           <div class="column col-9">
-            <h3>
-              { $definition.title }
-            </h3>
+            <h3>{ $definition.title }</h3><div id="color-finder" style="display: none"><span id="color-finder-error" class="text-error"></span>a<span id="color-finder-warning" class="text-warning">b</span><span id="color-finder-success" class="text-success">c</span></div>
           </div>
           <div class="column col-3">
             <label class="form-switch" style="float: right">
@@ -171,7 +194,7 @@
               {#if typeof item == "string"}
               <Highlighter parameters={$definition.parameters} item={item}/>
               {:else}
-              <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[item.name]} parameter={item}/>
+              <Parameter on:newvalue={onnewcontrolvalue} onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[item.name]} parameter={item}/>
               {/if}
               {/each}
             </div>
@@ -194,10 +217,10 @@
           <div class="column col-7 col-sm-12">
             {#if parameter.type == "static"}
             <label class="form-label" >
-            <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter on:newvalue={onnewcontrolvalue} onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             </label>
             {:else}
-            <Parameter onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
+            <Parameter on:newvalue={onnewcontrolvalue} onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$controls[parameter.name]} parameter={parameter}/>
             {/if}
           </div>
         </div>

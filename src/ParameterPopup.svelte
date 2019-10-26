@@ -2,6 +2,8 @@
 export let parameter;
 export let control;
 export let popup
+export let onerror;
+export let onfix;
 
 function getDisplayValue(controlValue) {
   return decodeURIComponent(
@@ -9,9 +11,11 @@ function getDisplayValue(controlValue) {
   );
 }
 
+control.value != "" ? onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+
 </script>
 <strong>
-  <button class="input-popup" on:click={() => popup(parameter.name)}>
+  <button data-parameter-name={parameter.name} class="input-popup" on:click={() => popup(parameter.name)}>
     <div>{getDisplayValue(control.value)}</div>&nbsp;⯅
   </button>
 </strong>

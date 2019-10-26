@@ -1,5 +1,5 @@
 import test from 'tape';
-import { processDateTime, getStep, getHightlightPositions, getHightlightString, LineType } from '../ts-src/ui';
+import { initializeDateTime, processDateTime, getStep, getHightlightPositions, getHightlightString, LineType } from '../ts-src/ui';
 
 test("getStep", (assert) => {
     assert.is(getStep(2), "0.01");
@@ -13,17 +13,50 @@ test("getStep", (assert) => {
 });
 
 
-test("processDateTime", (assert) => {
-    assert.is(processDateTime("date", '1990-10-21'), '1990-10-21');
-    assert.is(processDateTime("date", '1990-10-21T11:44:22'), '1990-10-21');
-    assert.is(processDateTime("datetime", '1990-10-21T11:44:22.000Z'), '1990-10-21T11:44:22.000Z');
+test("processDateTime Empty", (assert) => {
+    assert.deepEqual(
+        processDateTime({ value: '', date: '', time: ''}),
+        {
+            value: '',
+            date: '',
+            time: ''
+        }
+    );
+    assert.end();
+});
+
+test("processDateTime Happy", (assert) => {
+    assert.deepEqual(
+        processDateTime({ value: '1990-10-21T11:44:22.000Z', date: '1992-10-21', time: '09:44:22.000Z'}),
+        {
+            value: '1992-10-21T09:44:22.000Z',
+            date: '1992-10-21',
+            time: '09:44:22.000Z'
+        }
+    );
+    assert.end();
+});
+
+test("initializeDateTime", (assert) => {
+    assert.deepEqual(
+        initializeDateTime(""),
+        { value: "", time: "", date: "" }
+    );
+    assert.deepEqual(
+        initializeDateTime("1990-10-21T11:44:22.000Z"),
+        {
+            value: "1990-10-21T11:44:22.000Z",
+            time: "11:44:22.000Z",
+            date: "1990-10-21"
+        }
+    );
     assert.end();
 });
 
 test('getHightlightPositions', (assert) => {
     assert.deepEqual(
         getHightlightPositions(
-            [ "first_name", undefined ],
+            [ "first_name" ],
             "insert into x (first_name, first_name, last_name)"
         ),
         [{ begin: 15, end: 25 }, { begin: 27, end: 37 }]
