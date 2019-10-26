@@ -6,7 +6,7 @@
 
   function getParts(params, theItem) {
     const parameterNames = Array.from(new Set(params.reduce(
-      (acc, {highlight_fields}) => acc.concat(highlight_fields || []),
+      (acc, {name, highlight_fields}) => acc.concat(highlight_fields || [name]),
       []
     )));
     return getHightlightString(getHightlightPositions(parameterNames, theItem), theItem);

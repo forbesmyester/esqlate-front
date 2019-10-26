@@ -64,7 +64,8 @@
   function onfocus({target}) {
     const stylesheet = resetStylesheet("onblur-onfocus-style");
     try {
-      const flds = JSON.parse(target && target.dataset && target.dataset.highlightFields || "[]");
+      let flds = JSON.parse(target && target.dataset && target.dataset.highlightFields || "[]");
+      if (flds.length == 0) { flds = [target.name] }
       flds.forEach((fld) => {
         stylesheet.insertRule(`.field_highlight[data-field="${fld}"] { font-weight: bold; color: black; }`);
       });
