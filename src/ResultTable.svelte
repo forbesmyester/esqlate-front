@@ -113,31 +113,44 @@
 
 
   let args = [];
-  let links = writable([]);
+  let links = [];
+  // let links = writable([]);
 
-  const unsubControls = controls.subscribe((controlValue) => {
-
-    args = Object.getOwnPropertyNames(controlValue || {}).map(
+  function getValuesFromControls(currentControls) {
+    return Object.getOwnPropertyNames(currentControls || {}).map(
       (name) => {
-        return { name: name, val: controlValue[name].value }
+        return { name: name, val: currentControls[name].value }
       }
-    );
+    )
+  }
 
-    let tmp = (definition.links || []).map(
-      (link) => {
-        return getLink(
+  function getValuesFromResults(currentResults) {
+    if (!currentResults || !currentResults.rows || !currentResults.rows.length) {
+      return [];
+    }
+    return currentResults.fields.map((fld, i) => {
+      return { name: fld.name, val: currentResults.rows[0][i] };
+    });
+  }
+
+  $: args = getValuesFromControls(controls).concat(getValuesFromResults(result));
+
+  $: links = (definition.links || []).reduce(
+    (acc, link) => {
+      try {
+        return acc.concat([getLink(
           normalizeLink(args.map(({name}) => name), link),
           asRow(args.map(({name}) => name), [], args)
-        );
+        )]);
+      } catch (e) {
+        return acc;
       }
-    );
+    },
+    []
+  );
 
-    links.set(tmp);
-  });
-  onDestroy(unsubControls);
-
-  function getFieldnames() {
-    return args.map(({name}) => name).concat(
+  function getFieldnames(myArgs) {
+    return myArgs.map(({name}) => name).concat(
       (result && result.fields) ? (result.fields || []).map(({name}) => name) : []
     );
   }
@@ -146,7 +159,7 @@
   window.onresize = debounce(syncTable, 200);
 </script>
   <div id="main_links">
-    {#each $links as link}
+    {#each links as link}
     <Link link={link}/>
     {/each}
   </div>
@@ -191,7 +204,7 @@
             {:else}
             <td style="text-align: left">
               {#each definition.row_links  || [] as link}
-              <Link link={getLink(normalizeLink(getFieldnames(), link), asRow(row, result.fields, getFieldnames())) }/>
+              <Link link={getLink(normalizeLink(getFieldnames(args), link), asRow(row, result.fields, args)) }/>
               {/each}
             </td>
             {/if}

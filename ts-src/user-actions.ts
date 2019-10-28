@@ -1,4 +1,4 @@
-import {EsqlateDefinition, EsqlateParameterPopup, EsqlateCompleteResult, EsqlateCompleteResultRow} from 'esqlate-lib';
+import {EsqlateDefinition, EsqlateParameterPopup, EsqlateCompleteResult, EsqlateCompleteResultRow, EsqlateParameterString} from 'esqlate-lib';
 import { EsqlateQueryComponent } from './types';
 import {ControlStore, serializeValues, addControlStoreToEsqlateQueryComponents, addBackValuesToControlStore, pushBackToControlStore, popBackFromArguments, urlSearchParamsToArguments} from './controls';
 
@@ -14,7 +14,12 @@ export function getPopupLinkCreator(getURLSearchParams: () => URLSearchParams) {
             throw new Error(`Could not find Select(name=${parameterName})`);
         }
 
-        const qs = serializeValues(addControlStoreToEsqlateQueryComponents(controls, []));
+        const qs = serializeValues(
+            addControlStoreToEsqlateQueryComponents(
+                controls,
+                []
+            )
+        );
         const backRoute = encodeURIComponent(
             `/${encodeURIComponent(definitionName)}?${qs}`
         );
@@ -29,7 +34,12 @@ export function getPopupLinkCreator(getURLSearchParams: () => URLSearchParams) {
                 disp: parameter.display_field
             }
         );
-        const newQs = serializeValues(addControlStoreToEsqlateQueryComponents(newBacks, []));
+        const newQs = serializeValues(
+            addControlStoreToEsqlateQueryComponents(
+                newBacks,
+                []
+            )
+        );
 
         return `/${encodeURIComponent(parameter.definition)}?${newQs}`
     }
@@ -57,7 +67,8 @@ export function pick(row: EsqlateCompleteResultRow, query: EsqlateQueryComponent
         throw new Error(`Return is a field that doesn't exist ${back.fld}`);
     }
 
-    const newQsValues = urlSearchParamsToArguments(new URLSearchParams(back.url.replace(/.*\?/, '')))
+    const usp = new URLSearchParams(back.url.replace(/.*\?/, ''));
+    const newQsValues = urlSearchParamsToArguments(usp)
         .filter((esqArg) => esqArg.name != back.fld)
         .concat([{
             name: back.fld,
@@ -65,7 +76,12 @@ export function pick(row: EsqlateCompleteResultRow, query: EsqlateQueryComponent
                 encodeURIComponent(row[displayIndex])
         }]);
 
-    const qs = serializeValues(addControlStoreToEsqlateQueryComponents({}, newQsValues))
+    const qs = serializeValues(
+        addControlStoreToEsqlateQueryComponents(
+            {},
+            newQsValues
+        )
+    );
 
     return `/${encodeURIComponent(back.name)}?${qs}`
 }

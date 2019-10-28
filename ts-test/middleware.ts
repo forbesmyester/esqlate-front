@@ -7,21 +7,22 @@ import { EsqlateQueryComponent } from "../ts-src/types";
 import { Cache, Controls } from "../ts-src/types";
 
 import test from 'tape';
-import {getInitilizeControls, getLoadDefinition} from '../ts-src/middleware';
+import {getInitilizeControls, getLoadDefinition, getInitialViewStore, ViewStore} from '../ts-src/middleware';
 
 test('getLoadDefinition - simplist', (assert) => {
     assert.plan(5);
 
     const unnormalizedStatement: EsqlateStatement = "SELECT * FROM customers\nWHERE\n  country = $country AND\n  LOWER(company_name) LIKE CONCAT('%', LOWER($search_string), '%') OR\n  LOWER(contact_name) LIKE CONCAT('%', LOWER($search_string), '%')";
-    let controls: Writable<Controls> = writable({});
-    let definition: Writable<EsqlateDefinition> = writable({
-        "name": "",
-        "title": "",
-        "description": "",
-        "parameters": [],
-        "statement": ""
+    let viewStore: Writable<ViewStore> = writable({
+        ...getInitialViewStore(),
+        definition: {
+            "name": "",
+            "title": "",
+            "description": "",
+            "parameters": [],
+            "statement": ""
+        }
     });
-    let statement: Writable<EsqlateStatementNormalized[]> = writable([]);
     const getURLSearchParams = () => new URLSearchParams("?search_string=Rob&unused=value");
     let requestedDefinitions: string[] = [];
     let demandedResults: string[] = [];
@@ -71,18 +72,18 @@ test('getLoadDefinition - simplist', (assert) => {
     const cacheDefinition = getCache(definitionRequest);
     const cacheCompleteResultForSelect = getCache(resultDemand);
 
-    const loadDefinition = getLoadDefinition(cacheDefinition, definition);
-    const initializeControls = getInitilizeControls(controls, statement, getURLSearchParams, cacheCompleteResultForSelect);
+    const loadDefinition = getLoadDefinition(cacheDefinition, viewStore);
+    const initializeControls = getInitilizeControls(viewStore, getURLSearchParams, cacheCompleteResultForSelect);
 
     loadDefinition(ctx)
         .then(initializeControls)
         .then((_ctx) => {
             assert.is(
-                (getStoreValue(definition) as EsqlateDefinition).name,
+                (getStoreValue(viewStore).definition as EsqlateDefinition).name,
                 "customer_search"
             );
             assert.is(
-                (getStoreValue(statement) as EsqlateStatementNormalized[]).length,
+                (getStoreValue(viewStore).statement as EsqlateStatementNormalized[]).length,
                 5
             );
             assert.deepEqual(
@@ -94,7 +95,7 @@ test('getLoadDefinition - simplist', (assert) => {
                 ["customer_country_count"]
             );
             assert.deepEqual(
-                (getStoreValue(controls)),
+                (getStoreValue(viewStore).controls),
                 {
                     search_string: { value: "Rob" },
                     country: {

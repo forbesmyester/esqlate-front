@@ -34,8 +34,6 @@ function onchangetime({ target: { value: evtValue } }) {
     }
 }
 
-console.log("B", control.value);
-console.log("E", control.value);
 control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
 
 </script>

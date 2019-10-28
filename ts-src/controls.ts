@@ -35,6 +35,7 @@ export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateQueryCo
  */
 export function addControlStoreToEsqlateQueryComponents(cs: ControlStore, esqArg: EsqlateQueryComponent[]): EsqlateQueryComponent[] {
     const fromCs: Set<String> = new Set(Object.getOwnPropertyNames(cs));
+
     return Object.getOwnPropertyNames(cs).reduce(
         (acc: EsqlateQueryComponent[], k: string) => {
             return acc.concat([{ name: k, val: cs[k].value }]);
@@ -49,7 +50,7 @@ export function getControlStore(
     optionsForSelect: OptionsForEsqlateParameterSelect[]
 ): ControlStore {
 
-   const inputValues: Map<string, EsqlateQueryComponent["val"]> = query.reduce(
+    const inputValues: Map<string, EsqlateQueryComponent["val"]> = query.reduce(
         (acc, { name, val }: EsqlateQueryComponent) => {
             acc.set(name, val);
             return acc;
@@ -254,6 +255,7 @@ export function pushBackToControlStore(qry: ControlStore, url: BackUrl): Control
 
 export function queryComponentsToArguments(params: EsqlateDefinition["parameters"], queryComps: EsqlateQueryComponent[]): EsqlateArgument[] {
 
+    // Popups are treated specially as thier value is urlencoded in the UI.
     const popups: Set<string> = new Set(
         params
             .filter((p) => p.type == "popup")
@@ -277,16 +279,3 @@ export function queryComponentsToArguments(params: EsqlateDefinition["parameters
     return queryComps.map(mapper).filter(filterer);
 }
 
-// ControlStoreItem -> sql
-// ControlQueryItem -> ControlStoreItem
-
-// function updateControlStoreItem(parameter: EsqlateParameter, inputValue: string): ControlStoreItem {
-// }
-
-// getControlStore - only used in middleware, once
-// getQuery - massive use - takes querystring (or not} and converts to { name, value }[] - consider replacing for getURLSearchParams() in io 
-// popBackFromArguments - used twice takes getQuery result, removes highest back and returns url, move both into user-actions
-// addControlStoreToEsqlateQueryComponents - always used with serializeValues except when posting for SQL - merges ControlStore and getQuery() with ControlStore taking precedence.
-// serializeValues(addControlStoreToEsqlateQueryComponents(getStoreValue(controls), getQuery()))
-// store -> display
-// display -> value
