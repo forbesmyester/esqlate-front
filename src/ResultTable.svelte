@@ -1,14 +1,16 @@
 <script>
   import Link from "./Link.svelte";
-  import { beforeUpdate, afterUpdate } from 'svelte';
+  import { onDestroy, beforeUpdate, afterUpdate } from 'svelte';
+  import { writable, get as getStoreValue } from 'svelte/store';
   import { asRow, normalizeLink, getLink } from "./controls";
   import debounce from "debounce";
 
   export let definition;
+  export let controls;
+
   export let result;
   export let inPopup;
   export let pick;
-  export let args;
 
   const id = inPopup ? "in-popup-results" : "out-popup-results";
 
@@ -109,24 +111,45 @@
     return null;
   }
 
-  let fieldnames = [];
-  beforeUpdate(() => {
-    fieldnames = (args || []).map(({name}) => name);
-    fieldnames = fieldnames.concat(
-      (result && result.fields) ? result.fields.map(({name}) => name) : []
+
+  let args = [];
+  let links = writable([]);
+
+  const unsubControls = controls.subscribe((controlValue) => {
+
+    args = Object.getOwnPropertyNames(controlValue || {}).map(
+      (name) => {
+        return { name: name, val: controlValue[name].value }
+      }
     );
+
+    let tmp = (definition.links || []).map(
+      (link) => {
+        return getLink(
+          normalizeLink(args.map(({name}) => name), link),
+          asRow(args.map(({name}) => name), [], args)
+        );
+      }
+    );
+
+    links.set(tmp);
   });
+  onDestroy(unsubControls);
+
+  function getFieldnames() {
+    return args.map(({name}) => name).concat(
+      (result && result.fields) ? (result.fields || []).map(({name}) => name) : []
+    );
+  }
 
   afterUpdate(syncTable);
   window.onresize = debounce(syncTable, 200);
 </script>
-  {#if result && result.fields }
   <div id="main_links">
-    {#each definition.links  || [] as link}
-    <Link link={getLink(normalizeLink(fieldnames, link), asRow(fieldnames, [], args)) }/>
+    {#each $links as link}
+    <Link link={link}/>
     {/each}
   </div>
-  {/if}
 <div id={id}>
   <style id={ id + "-style" }>
   </style>
@@ -166,9 +189,9 @@
               <button class="btn btn-link" on:click={c => pick(row)}>Pick</button>
             </td>
             {:else}
-            <td style="text-align: center">
+            <td style="text-align: left">
               {#each definition.row_links  || [] as link}
-              <Link link={getLink(normalizeLink(fieldnames, link), asRow(row, result.fields, args)) }/>
+              <Link link={getLink(normalizeLink(getFieldnames(), link), asRow(row, result.fields, getFieldnames())) }/>
               {/each}
             </td>
             {/if}

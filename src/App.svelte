@@ -1,7 +1,6 @@
 <script>
 
   import { getHightlightPositions, getHightlightString } from './ui';
-  import { onDestroy } from 'svelte';
   import { get as getStoreValue } from 'svelte/store';
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
@@ -32,15 +31,11 @@
   let showingSql = true;
   let md = new window.markdownit();
 
-  let args = [];
-  const unsubControls = controls.subscribe((controlValue) => {
-    args = Object.getOwnPropertyNames(controlValue || {}).map(
-      (name) => {
-        return { name: name, val: controlValue[name].value }
-      }
-    );
-  });
-  onDestroy(unsubControls);
+  function getDefaultArgs() {
+    return definition.parameter.map(({name}) => {
+      return { name: name };
+    });
+  }
 
   let sidebarActive = false;
   function showSidebar() { sidebarActive = true; }
@@ -160,7 +155,6 @@
           { $result.message }
         </div>
       </div>
-      });
     </div>
   </div>
 {/if}
@@ -230,7 +224,7 @@
       {/if}
     </div>
       {#if $popupMode}
-      <ResultTable args={args} pick={pick} inPopup={true} definition={$definition} result={$result}/>
+      <ResultTable controls={controls} pick={pick} inPopup={true} definition={$definition} result={$result}/>
       {/if}
 
 
@@ -249,7 +243,7 @@
 
 {#if !$popupMode}
 <div style="margin-top: 3em" class={ ($popupMode) ? "in-popup" : "" }>
-<ResultTable args={args} inPopup={false} definition={$definition} result={$result}/>
+  <ResultTable controls={controls} inPopup={false} definition={$definition} result={$result}/>
 </div>
 {/if}
   </div>
