@@ -103,6 +103,17 @@
     });
   }
 
+  function buttonClass(statementType) {
+    switch (statementType) {
+      case "INSERT":
+      case "DELETE":
+      case "UPDATE":
+        return "btn-error";
+      case "SELECT":
+        return "btn-success";
+    }
+    return "";
+  }
 </script>
 
 <div class="off-canvas">
@@ -222,7 +233,9 @@
       {#if $viewStore.asPopup}
       <button class="btn btn-link" on:click={cancel}>Cancel</button>
       {/if}
-      <button class="btn btn-primary" on:click={run}>List</button>
+      <button class={ "btn btn-primary " + buttonClass($viewStore.definition.statement_type) } on:click={run}>
+        { $viewStore.definition.statement_type || "EXECUTE" }
+      </button>
       </div></div></div>
     </div>
   </div>
