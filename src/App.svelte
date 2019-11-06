@@ -130,6 +130,9 @@
   }
 
   afterUpdate(() => {
+    if (getStoreValue(viewStore).definition && getStoreValue(viewStore).definition.title) {
+      window.document.title = `Esqlate: ${getStoreValue(viewStore).definition.title}`;
+    }
     if (getStoreValue(viewStore).loading) {
       setTimeout(() => {
         if (getStoreValue(viewStore).loading) {
