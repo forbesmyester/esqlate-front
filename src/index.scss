@@ -136,7 +136,7 @@ input, select, .input-popup {
     opacity: 0;
     transition: opacity 1s ease-out;
     &.loading-notification {
-        opacity: 1;
+        opacity: 0.8;
     }
     div {
         position: absolute;
