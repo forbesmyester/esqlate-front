@@ -200,6 +200,18 @@ function errorHandler(error) {
     viewStore.update((vs) => ({...vs, result: {...vs.result, message}}));
 }
 
+function finishedLoading(ctx) {
+    viewStore.update((vs) => {
+        return {...vs, loading: false}
+    });
+    return Promise.resolve(ctx);
+}
+function setLoading(ctx) {
+    viewStore.update((vs) => {
+        return {...vs, loading: true}
+    });
+    return Promise.resolve(ctx);
+}
 
 const viewStore = writable(getInitialViewStore());
 
@@ -230,6 +242,7 @@ const app = new App({
 
 var routes = {
     '/:definitionName': promiseChain(errorHandler, [
+        setLoading,
         ([definitionName]) => {
             console.log("ROUTE:", '/:definitionName', [definitionName], window.location);
             return Promise.resolve({ params: { definitionName } });
@@ -239,8 +252,10 @@ var routes = {
         getLoadDefinition(cacheDefinition, viewStore),
         getInitilizeControls(viewStore, getURLSearchParams, cacheCompleteResultForSelect),
         hideResults,
+        finishedLoading,
     ]),
     '/:definitionName/request': promiseChain(errorHandler, [
+        setLoading,
         ([definitionName]) => {
             console.log("ROUTE:", '/:definitionName/request', [definitionName], window.location);
             return Promise.resolve({ params: { definitionName } });
@@ -253,6 +268,7 @@ var routes = {
         createRequest,
     ]),
     '/:definitionName/request/:requestLocation': promiseChain(errorHandler, [
+        setLoading,
         ([definitionName, requestLocation]) => {
             console.log("ROUTE:", '/:definitionName/request/:requestLocation', [definitionName, requestLocation], window.location);
             return Promise.resolve({
@@ -272,6 +288,9 @@ var routes = {
     '/:definitionName/:resultOrDownload/:resultLocation': promiseChain(errorHandler, [
         ([definitionName, resultOrDownload, requestLocation]) => {
             console.log("ROUTE:", '/:definitionName/result/:resultLocation', [definitionName, requestLocation], window.location);
+            if (resultOrDownload == "result") {
+                setLoading();
+            }
             return Promise.resolve({
                 params: {
                     showingDownload: (resultOrDownload == "download"),
@@ -284,6 +303,7 @@ var routes = {
         getLoadDefinition(cacheDefinition, viewStore),
         getInitilizeControls(viewStore, getURLSearchParams, cacheCompleteResultForSelect),
         loadResults,
+        finishedLoading,
     ]),
 };
 
@@ -293,7 +313,7 @@ router = window.Router(routes);
 router.configure({
     notfound: (r) => {
         errorHandler("Route not found " + r);
-    }
+    },
 });
 router.init();
 

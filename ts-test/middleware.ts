@@ -178,7 +178,7 @@ test('loadResults - do summat', (assert) => {
             extra = {
                 status: "complete",
                 full_format_urls: [
-                    { type: "application/csv", location: "x" }
+                    { type: "text/csv", location: "x" }
                 ],
             };
         }
@@ -206,7 +206,7 @@ test('loadResults - do summat', (assert) => {
                     status: "complete",
                     full_format_urls: [
                         {
-                            type: "application/csv",
+                            type: "text/csv",
                             location: "x"
                         }
                     ]

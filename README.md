@@ -1,6 +1,6 @@
 # Esqlate Front
 
-Esqlate Front provides a web interface for the [Esqlate Projects](https://github.com/forbesmyester/esqlate) API Server, [Esqlate Server](https://github.com/forbesmyester/esqlate-server).
+Esqlate Front provides a web interface for the [Esqlate Projects](https://github.com/forbesmyester/esqlate) API Server [Esqlate Server](https://github.com/forbesmyester/esqlate-server).
 
 # Installation
 
@@ -25,4 +25,4 @@ lighttpd -f lighttpd.conf -D
 
 As you can see there is nothing too weird there so feel free to use whatever HTTP/HTTPS server you wish.
 
-Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use Esqlate
+Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use Esqlate.

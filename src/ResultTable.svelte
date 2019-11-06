@@ -214,16 +214,18 @@
           {/each}
         </tbody>
       </table>
-      {#if inPopup && !result.full_data_set }
-        <div class="toast toast-warning" style="margin-top: 3em">
+      {#if inPopup}
+        {#if !result.full_data_set }
+        <div class="toast toast-warning toast-resultset-warning">
           ⚠ The result set is very large and not all results are shown.
         </div>
+        {/if}
       {:else if !result.full_data_set }
-        <div class="toast toast-warning" style="margin-top: 3em">
+        <div class="toast toast-warning toast-resultset-warning" >
           ⚠ Warning: This result set is very large and not all are shown. If you want to see the full results you will have to <a href="#show-downloads" on:click|preventDefault={showDownloads}>download them</a>.
         </div>
       {:else}
-        <div class="toast toast-success" style="margin-top: 3em">
+        <div class="toast toast-success toast-resultset-warning">
           All the results are showing but you can sitill <a href="#show-downloads" on:click|preventDefault={showDownloads}>download the results</a>.
         </div>
       {/if}

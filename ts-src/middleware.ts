@@ -17,11 +17,13 @@ export interface ViewStore {
     result: EsqlateResult | false;
     controls: Controls;
     asPopup: boolean;
+    loading: boolean;
     menu: { title: string; name: string }[];
 }
 
 export function getInitialViewStore(): ViewStore {
     return {
+        loading: false,
         showingDownload: false,
         definition: {
             description: "",

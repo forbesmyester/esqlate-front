@@ -1,6 +1,7 @@
 <script>
 
   import { getHightlightPositions, getHightlightString } from './ui';
+  import { afterUpdate } from 'svelte';
   import { get as getStoreValue } from 'svelte/store';
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
@@ -128,6 +129,17 @@
     return () => download(mimeType);
   }
 
+  afterUpdate(() => {
+    if (getStoreValue(viewStore).loading) {
+      setTimeout(() => {
+        if (getStoreValue(viewStore).loading) {
+          document.getElementById("loading-modal").classList.add("loading-notification");
+        }
+      }, 250);
+    } else {
+      document.getElementById("loading-modal").classList.remove("loading-notification");
+    }
+  })
 
 </script>
 
@@ -272,7 +284,7 @@
       </div>
     </div>
     <div class="modal-body">
-      <div class="content">
+      <div class="content" style="min-height: 2rem">
         {#if getDownloads($viewStore.result).length }
           {#each getDownloads($viewStore.result) as link}
             <a href="#download" on:click|preventDefault={runDownload(link.type)}>{link.type}</a>
@@ -296,5 +308,11 @@
   <ResultTable showDownloads={showDownloads} controls={$viewStore.controls} inPopup={false} definition={$viewStore.definition} result={$viewStore.result}/>
 </div>
 {/if}
+  </div>
+</div>
+
+<div class={$viewStore.loading ? "modal active" : "modal"} id="loading-modal"> 
+  <div id="loading-modal-content">
+    🕓
   </div>
 </div>
