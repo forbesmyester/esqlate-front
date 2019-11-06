@@ -1,4 +1,4 @@
-import {EsqlateDefinition, EsqlateParameterPopup, EsqlateCompleteResult, EsqlateCompleteResultRow, EsqlateParameterString} from 'esqlate-lib';
+import {EsqlateDefinition, EsqlateParameterPopup, EsqlateParameterString, EsqlateSuccessResult, EsqlateSuccessResultRow} from 'esqlate-lib';
 import { EsqlateQueryComponent } from './types';
 import {ControlStore, serializeValues, addControlStoreToEsqlateQueryComponents, addBackValuesToControlStore, pushBackToControlStore, popBackFromArguments, urlSearchParamsToArguments} from './controls';
 
@@ -45,7 +45,7 @@ export function getPopupLinkCreator(getURLSearchParams: () => URLSearchParams) {
     }
 }
 
-export function pick(row: EsqlateCompleteResultRow, query: EsqlateQueryComponent[], fields: EsqlateCompleteResult["fields"]) {
+export function pick(row: EsqlateSuccessResultRow, query: EsqlateQueryComponent[], fields: EsqlateSuccessResult["fields"]) {
 
     const back = popBackFromArguments(query);
 

@@ -1,6 +1,6 @@
 import test from 'tape';
 import { getControlStore, normalizeLink, getLink, asRow, addBackValuesToControlStore, ControlStoreInputValue, popBackFromArguments, pushBackToControlStore, EsqlateLinkNormalized, queryComponentsToArguments } from "../ts-src/controls";
-import { EsqlateCompleteResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateDefinition, EsqlateArgument } from 'esqlate-lib';
+import { EsqlateSuccessResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateDefinition, EsqlateArgument } from 'esqlate-lib';
 import { EsqlateQueryComponent } from '../ts-src/types';
 
 test("normalizeEsqlateLink", (assert) => {
@@ -72,7 +72,7 @@ test('asRow', (assert) => {
 test('getControlStore', (assert) => {
     assert.plan(1);
 
-    const result: EsqlateCompleteResult = {
+    const result: EsqlateSuccessResult = {
         status: "complete",
         fields:[
             {"name":"display","type":"text"},

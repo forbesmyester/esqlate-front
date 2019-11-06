@@ -8,10 +8,12 @@
 
   export let pick;
   export let run;
+  export let cancelDownload;
   export let cancel;
   export let popup;
   export let viewStore;
-  console.log(getStoreValue(viewStore));
+  export let download;
+  export let showDownloads;
 
   let getColorCache = new Map();
 
@@ -114,6 +116,19 @@
     }
     return "";
   }
+
+  function getDownloads(result) {
+    if (result && result.full_format_urls && result.full_format_urls.length) {
+      return result.full_format_urls
+    }
+    return [];
+  }
+
+  function runDownload(mimeType) {
+    return () => download(mimeType);
+  }
+
+
 </script>
 
 <div class="off-canvas">
@@ -160,8 +175,8 @@
 
 
 <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" }>
-  <a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
-  <div class="columns" style={ $viewStore.asPopup ? "" : "margin-top: 2rem"}>
+<a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
+<div class="columns" style={ $viewStore.asPopup ? "" : "margin-top: 2rem"}>
   <div class="column col-auto modal-container code-popup" style="margin: auto">
 
     <div class="modal-header">
@@ -242,9 +257,43 @@
 </div>
 </div>
 
+{#if $viewStore.showingDownload}
+<div class="modal active" id="modal-id">
+  <a href="#close" class="modal-overlay" aria-label="Close" on:click|preventDefault={cancelDownload}>&nbsp;</a>
+  <div class="modal-container">
+    <div class="modal-header">
+      <a href="#close" on:click|preventDefault={cancelDownload} class="btn btn-clear float-right" aria-label="Close">&nbsp;</a>
+      <div class="modal-title h5">
+        {#if getDownloads($viewStore.result).length }
+          Please select a download
+        {:else}
+          Preparing downloads
+        {/if}
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="content">
+        {#if getDownloads($viewStore.result).length }
+          {#each getDownloads($viewStore.result) as link}
+            <a href="#download" on:click|preventDefault={runDownload(link.type)}>{link.type}</a>
+          {/each}
+        {:else}
+          <div style="text-align: center; font-size: 144pt;">
+            🕓
+          </div>
+        {/if}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#close" on:click|preventDefault={cancelDownload} aria-label="Close">Cancel</a>
+    </div>
+  </div>
+</div>
+{/if}
+
 {#if !$viewStore.asPopup}
 <div style="margin-top: 3em" class={ ($viewStore.asPopup) ? "in-popup" : "" }>
-  <ResultTable controls={$viewStore.controls} inPopup={false} definition={$viewStore.definition} result={$viewStore.result}/>
+  <ResultTable showDownloads={showDownloads} controls={$viewStore.controls} inPopup={false} definition={$viewStore.definition} result={$viewStore.result}/>
 </div>
 {/if}
   </div>

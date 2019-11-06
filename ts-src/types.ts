@@ -1,4 +1,4 @@
-import { EsqlateCompleteResult, EsqlateDefinition, EsqlateResult, EsqlateParameterSelect } from "esqlate-lib";
+import { EsqlateSuccessResult, EsqlateDefinition, EsqlateResult, EsqlateParameterSelect } from "esqlate-lib";
 import { Cache } from "esqlate-cache";
 
 export type URL = string;
@@ -13,7 +13,7 @@ export interface OptionsForEsqlateParameterSelect {
 
 export interface Cache {
     definition: Cache<EsqlateDefinition>;
-    selectResult: Cache<EsqlateCompleteResult>;
+    selectResult: Cache<EsqlateSuccessResult>;
 }
 
 export interface EsqlateQueryComponent {

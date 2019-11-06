@@ -1,4 +1,4 @@
-import { normalize, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateCompleteResult, EsqlateStatementNormalized, EsqlateParameterString } from "esqlate-lib";
+import { normalize, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateStatementNormalized, EsqlateSuccessResult, EsqlateParameterString } from "esqlate-lib";
 import { EsqlateQueryComponent, OptionsForEsqlateParameterSelect } from "./types";
 
 export type EsqlateLinkNormalized = {
@@ -61,17 +61,20 @@ export function getControlStore(
     function getOptions(parameter: EsqlateParameterSelect): ControlStoreSelectValue["options"] {
         const ps = optionsForSelect.filter(o => o.parameter.name == parameter.name);
         if (ps.length === 0) { return []; }
-        if (ps[0].result.status != "complete") { return [] } // TODO: Throw?
+        const result = ps[0].result;
+        if ((result.status != "preview") && (result.status != "complete")) {
+            return []
+        }
         let valueIndex = -1;
         let displayIndex = -1;
-        ps[0].result.fields.forEach((fld: EsqlateFieldDefinition, index: number) => {
+        result.fields.forEach((fld: EsqlateFieldDefinition, index: number) => {
             if (fld.name == parameter.value_field) { valueIndex = index; }
             if (fld.name == parameter.display_field) { displayIndex = index; }
         })
         if ((valueIndex == -1) || (displayIndex == -1)) {
             return [];
         }
-        return (ps[0].result.rows).map((row) => {
+        return (result.rows).map((row) => {
             return {
                 display: "" + row[displayIndex],
                 value: "" + row[valueIndex]
@@ -130,7 +133,7 @@ export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateL
 
 interface EsqlateRow { [k: string]: number | string | boolean; }
 
-export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateCompleteResult["fields"], args: EsqlateQueryComponent[]): EsqlateRow {
+export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateSuccessResult["fields"], args: EsqlateQueryComponent[]): EsqlateRow {
     const argsAsOb = args.reduce(
         (acc, arg) => {
             return {...acc, [arg.name]: arg.val };
@@ -138,7 +141,7 @@ export function asRow(rawRow: (number | string | boolean)[], fields: EsqlateComp
         {}
     );
     return fields.reduce(
-        (acc: EsqlateRow, field: EsqlateCompleteResult["fields"][0], index) => {
+        (acc: EsqlateRow, field: EsqlateSuccessResult["fields"][0], index) => {
             return { ...acc, [field.name]: rawRow[index] };
         },
         argsAsOb

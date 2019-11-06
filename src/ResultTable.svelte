@@ -11,6 +11,7 @@
   export let result;
   export let inPopup;
   export let pick;
+  export let showDownloads;
 
   const id = inPopup ? "in-popup-results" : "out-popup-results";
 
@@ -166,7 +167,7 @@
 <div id={id}>
   <style id={ id + "-style" }>
   </style>
-  {#if result && result.status == "complete"}
+  {#if result && ((result.status == "complete") || (result.status == "preview"))}
   <div class="columns">
     <div class="column col-auto" style="margin: 0 auto">
       <table class="results-head table table-striped table-hover" style="padding-bottom: 0; margin: 0">
@@ -213,6 +214,19 @@
           {/each}
         </tbody>
       </table>
+      {#if inPopup && !result.full_data_set }
+        <div class="toast toast-warning" style="margin-top: 3em">
+          ⚠ The result set is very large and not all results are shown.
+        </div>
+      {:else if !result.full_data_set }
+        <div class="toast toast-warning" style="margin-top: 3em">
+          ⚠ Warning: This result set is very large and not all are shown. If you want to see the full results you will have to <a href="#show-downloads" on:click|preventDefault={showDownloads}>download them</a>.
+        </div>
+      {:else}
+        <div class="toast toast-success" style="margin-top: 3em">
+          All the results are showing but you can sitill <a href="#show-downloads" on:click|preventDefault={showDownloads}>download the results</a>.
+        </div>
+      {/if}
     </div>
   </div>
   {/if}

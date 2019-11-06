@@ -1,7 +1,7 @@
 import test from 'tape';
 import { getPopupLinkCreator, pick } from '../ts-src/user-actions';
 import { EsqlateQueryComponent } from "../ts-src/types";
-import {EsqlateDefinition, EsqlateCompleteResult, EsqlateCompleteResultRow} from 'esqlate-lib';
+import {EsqlateDefinition, EsqlateSuccessResult, EsqlateSuccessResultRow} from 'esqlate-lib';
 
 test('getPopupLinkCreator', (assert) => {
 
@@ -54,7 +54,7 @@ test('getPopupLinkCreator', (assert) => {
 });
 
 test('pick', (assert) => {
-    const row: EsqlateCompleteResultRow = [ "Ocean Shipping International", "OCEAN" ];
+    const row: EsqlateSuccessResultRow = [ "Ocean Shipping International", "OCEAN" ];
     const query = [
         { name: "c", val: "integer" } as EsqlateQueryComponent,
         { name: "_burl0", val: "bu1" } as EsqlateQueryComponent,
@@ -67,7 +67,7 @@ test('pick', (assert) => {
         { name: "_bdisp1", val: "company_name" } as EsqlateQueryComponent,
     ];
 
-    const fields: EsqlateCompleteResult["fields"] = [
+    const fields: EsqlateSuccessResult["fields"] = [
         { name: "company_name", type: "varchar"},
         { name: "company_id", type: "varchar"},
     ];

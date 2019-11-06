@@ -1,9 +1,10 @@
 import { get as getStoreValue, writable } from 'svelte/store';
 import App from './App.svelte';
 import { waitFor } from 'esqlate-waitfor';
-import { getInitialViewStore, resultDemandHTTP, loadDefinitionHTTP, getInitilizeControls, getLoadDefinition } from "./middleware";
+import { getInitialViewStore, loadResults as loadResultsImpl, resultDemandHTTP, loadDefinitionHTTP, getInitilizeControls, getLoadDefinition } from "./middleware";
 import { addControlStoreToEsqlateQueryComponents, popBackFromArguments, serializeValues, queryComponentsToArguments, urlSearchParamsToArguments } from "./controls";
-import { getURLSearchParams, getRequest, postRequest } from "./io";
+import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
+import { getApiRoot, getURLSearchParams, getRequest, postRequest } from "./io";
 import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
 import { pick as runPick, getPopupLinkCreator } from "./user-actions";
@@ -24,6 +25,35 @@ function pick(row) {
         getStoreValue(viewStore).result.fields
     );
     router.setRoute(route);
+}
+
+function download(mimeType) {
+    const otherFormat = getStoreValue(viewStore).result.full_format_urls.filter(
+        (ffu) => ffu.type == mimeType
+    );
+    if (otherFormat.length == 0) {
+        throw Error(`Mime type ${mimeType} was requested but not found`);
+    }
+    window.location = getFullUrlFromResponseUrl(getApiRoot(), otherFormat[0].location);
+}
+
+
+function cancelDownload() {
+    router.setRoute(
+        window.location.hash.replace(
+            /^#\/?([^\/]+)\/((result)|(download))/,
+            "/$1/result"
+        )
+    );
+}
+
+function showDownloads() {
+    router.setRoute(
+        window.location.hash.replace(
+            /^#\/?([^\/]+)\/((result)|(download))/,
+            "/$1/download"
+        )
+    );
 }
 
 function cancel() {
@@ -95,7 +125,7 @@ function waitForRequest(ctx) {
         return getRequest(ctx.params.requestLocation)
             .then(resp => resp.json())
             .then((j) => {
-                if (j.status == "complete") {
+                if ((j.status == "preview") || (j.status == "complete")) {
                     return { complete: true, value: j.location };
                 }
                 return { complete: false };
@@ -121,11 +151,28 @@ function waitForRequest(ctx) {
 
 
 function loadResults(ctx) {
-    return getRequest(ctx.params.resultLocation)
-        .then(resp => resp.json())
-        .then((result) => {
-            viewStore.update((vs) => ({...vs, result}))
-            return {...ctx, result};
+
+    async function fetcher() {
+        const resp = await getRequest(ctx.params.resultLocation);
+        return await resp.json();
+    }
+
+    const desiredStatus = ctx.params.showingDownload ?
+        ["complete"] :
+        ["complete", "preview"];
+
+
+    viewStore.update((vs) => {
+        return {
+            ...vs,
+            showingDownload: ctx.params.showingDownload
+        }
+    });
+
+    return loadResultsImpl(fetcher, getStoreValue(viewStore), desiredStatus)
+        .then((vs) => {
+            viewStore.set(vs);
+            return ctx;
         });
 }
 
@@ -174,6 +221,9 @@ const app = new App({
         popup,
         pick,
         cancel,
+        cancelDownload,
+        showDownloads,
+        download,
     }
 });
 
@@ -219,11 +269,12 @@ var routes = {
         getInitilizeControls(viewStore, getURLSearchParams, cacheCompleteResultForSelect),
         waitForRequest,
     ]),
-    '/:definitionName/result/:resultLocation': promiseChain(errorHandler, [
-        ([definitionName, requestLocation]) => {
+    '/:definitionName/:resultOrDownload/:resultLocation': promiseChain(errorHandler, [
+        ([definitionName, resultOrDownload, requestLocation]) => {
             console.log("ROUTE:", '/:definitionName/result/:resultLocation', [definitionName, requestLocation], window.location);
             return Promise.resolve({
                 params: {
+                    showingDownload: (resultOrDownload == "download"),
                     definitionName,
                     resultLocation: decodeURIComponent(requestLocation)
                 }

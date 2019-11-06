@@ -1,8 +1,9 @@
 import { getRequest, postRequest } from "./io";
+import { waitFor } from 'esqlate-waitfor';
 import { getControlStore, urlSearchParamsToArguments } from "./controls";
 import { get as getStoreValue, Writable } from 'svelte/store';
-import { EsqlateStatementNormalized, newlineBreak, normalize, removeLineBeginningWhitespace, EsqlateDefinition, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter, EsqlateCompleteResult } from "esqlate-lib";
-import { OptionsForEsqlateParameterSelect, Controls } from "./types";
+import { EsqlateStatementNormalized, newlineBreak, normalize, removeLineBeginningWhitespace, EsqlateDefinition, EsqlateRequestCreation, EsqlateResult, EsqlateParameterSelect, EsqlateParameter, EsqlateSuccessResult } from "esqlate-lib";
+import { OptionsForEsqlateParameterSelect, Controls, URL } from "./types";
 import { Cache } from "esqlate-cache";
 
 interface LoadDefinitionCtx { definition?: EsqlateDefinition, params: { definitionName: string } }
@@ -10,6 +11,7 @@ interface LoadedDefinitionCtx { definition: EsqlateDefinition, params: { definit
 
 
 export interface ViewStore {
+    showingDownload: boolean,
     definition: EsqlateDefinition;
     statement: EsqlateStatementNormalized[];
     result: EsqlateResult | false;
@@ -20,6 +22,7 @@ export interface ViewStore {
 
 export function getInitialViewStore(): ViewStore {
     return {
+        showingDownload: false,
         definition: {
             description: "",
             name: "",
@@ -56,7 +59,7 @@ export async function resultDemandHTTP(definitionName: EsqlateDefinition["name"]
 export function getInitilizeControls(
     viewStore: Writable<ViewStore>,
     getURLSearchParams: () => URLSearchParams,
-    cacheCompleteResultForSelect: Cache<EsqlateCompleteResult>
+    cacheSuccessResultForSelect: Cache<EsqlateSuccessResult>
 ) {
     return async function loadDefinition(ctx: LoadedDefinitionCtx): Promise<LoadedDefinitionCtx> {
 
@@ -68,7 +71,7 @@ export function getInitilizeControls(
 
         const options: OptionsForEsqlateParameterSelect[] = await Promise.all(
             selects.map((parameter) => {
-                return cacheCompleteResultForSelect(parameter.definition)
+                return cacheSuccessResultForSelect(parameter.definition)
                     .then((result) => {
                         return { parameter, result };
                     });
@@ -111,3 +114,36 @@ export function getLoadDefinition(
 }
 
 
+export async function loadResults(fetcher: () => Promise<EsqlateSuccessResult>, viewStore: ViewStore, desiredState: EsqlateResult["status"][]): Promise<ViewStore> {
+
+    function inDesiredState(statusStr: EsqlateResult["status"]) {
+        return desiredState.indexOf(statusStr) > -1;
+    }
+
+    function calculateNewDelay(attemptsSoFar: number) {
+        return attemptsSoFar * 300;
+    }
+
+    async function perform() {
+        const j = await fetcher();
+        if (inDesiredState(j.status)) {
+            return {complete: true, value: j};
+        }
+        return {complete: false};
+    }
+
+    if (viewStore.result && inDesiredState(viewStore.result.status)) {
+        return Promise.resolve({...viewStore });
+    }
+
+    return waitFor(perform, calculateNewDelay)
+        .then((json: EsqlateSuccessResult) => {
+            return {
+                ...viewStore,
+                result: {
+                    ...viewStore.result,
+                    ...json
+                }
+            };
+        });
+}
