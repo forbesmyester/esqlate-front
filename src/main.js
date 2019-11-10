@@ -241,6 +241,13 @@ const app = new App({
 
 
 var routes = {
+    '/': promiseChain(errorHandler, [
+        ([definitionName]) => {
+            console.log("ROUTE:", '/', window.location);
+            viewStore.update((vs) => ({...vs, showingMenu: true }));
+            return Promise.resolve({ params: { definitionName } });
+        }
+    ]),
     '/:definitionName': promiseChain(errorHandler, [
         setLoading,
         ([definitionName]) => {
@@ -311,8 +318,8 @@ var routes = {
 let router;
 router = window.Router(routes);
 router.configure({
-    notfound: (r) => {
-        errorHandler("Route not found " + r);
+    notfound: (_r) => {
+        router.setRoute("/");
     },
 });
 router.init();

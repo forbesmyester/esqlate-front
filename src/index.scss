@@ -107,15 +107,26 @@ div#main_links {
     min-width: 8rem;
     div { float: left }
 }
-#sidebar-id {
-    #logo {
-        font-size: 2rem;
-        font-weight: bold;
-        background-color: black;
-        color: white;
-        margin: 2rem;
-        padding: 2rem;
+#showing-menu {
+    width: 35%;
+    margin: auto;
+    #menu {
+        margin-top: 3em;
+        list-style: none;
+        li a {
+            margin: 1rem;
+            color: #3b4351;
+        }
     }
+}
+#logo {
+    font-size: 2rem;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    padding: 2rem;
+}
+#sidebar-id {
     ul, #logo {
         margin: 2rem;
         list-style: none;

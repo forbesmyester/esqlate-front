@@ -11,6 +11,7 @@ interface LoadedDefinitionCtx { definition: EsqlateDefinition, params: { definit
 
 
 export interface ViewStore {
+    showingMenu: boolean;
     showingDownload: boolean,
     definition: EsqlateDefinition;
     statement: EsqlateStatementNormalized[];
@@ -23,6 +24,7 @@ export interface ViewStore {
 
 export function getInitialViewStore(): ViewStore {
     return {
+        showingMenu: false,
         loading: false,
         showingDownload: false,
         definition: {
@@ -109,7 +111,7 @@ export function getLoadDefinition(
 
     return async function loadDefinition(ctx: LoadDefinitionCtx): Promise<LoadedDefinitionCtx> {
         const definition = await cacheDefinition(ctx.params.definitionName);
-        viewStore.update((vs) => ({...vs, definition}));
+        viewStore.update((vs) => ({...vs, showingMenu: false, definition}));
         return {...ctx, definition};
     };
 
