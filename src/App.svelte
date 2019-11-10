@@ -144,9 +144,23 @@
     }
   })
 
+  $: if (($viewStore.result || {}).status == "error") {
+    esqlateShowToastError($viewStore.result.message);
+  }
+
 </script>
 
 {#if $viewStore.showingMenu}
+  <div class="columns" id="toast-error-wrapper" style="display:none">
+    <div class="column col-auto" style="margin: 3rem auto">
+      <div class="toast toast-error">
+        <button class="btn btn-clear float-right" onclick="esqlateHideToastError()"></button>
+        <div id="toast-error-wrapper-text" style="padding: 1em">
+          xx
+        </div>
+      </div>
+    </div>
+  </div>
   <div id="showing-menu">
     <div id="logo">Esqlate</div>
     <ul id="menu">
@@ -189,18 +203,16 @@
 
     <div class="off-canvas-content">
 
-      {#if ($viewStore.result || {}).status == "error"}
-      <div class="columns">
+      <div class="columns" id="toast-error-wrapper" style="display:none">
         <div class="column col-auto" style="margin: 3rem auto 0 auto">
           <div class="toast toast-error">
-            <button class="btn btn-clear float-right"></button>
-            <div style="padding: 1em">
-              { $viewStore.result.message }
+            <button class="btn btn-clear float-right" onclick="esqlateHideToastError()"></button>
+            <div id="toast-error-wrapper-text" style="padding: 1em">
+              xx
             </div>
           </div>
         </div>
       </div>
-      {/if}
 
 
       <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" }>
