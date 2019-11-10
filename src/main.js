@@ -314,6 +314,9 @@ var routes = {
     ]),
 };
 
+if (window.location.hash == "") {
+    window.location.hash = "/";
+}
 
 let router;
 router = window.Router(routes);
