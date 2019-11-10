@@ -197,7 +197,8 @@ function errorHandler(error) {
     if (error.message) {
         message = error.message;
     }
-    viewStore.update((vs) => ({...vs, result: {...vs.result, message}}));
+    document.getElementById("loading-modal").classList.remove("active");
+    esqlateShowToastError(message);
 }
 
 function finishedLoading(ctx) {
