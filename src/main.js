@@ -158,8 +158,8 @@ function loadResults(ctx) {
     }
 
     const desiredStatus = ctx.params.showingDownload ?
-        ["complete"] :
-        ["complete", "preview"];
+        ["error", "complete"] :
+        ["error", "complete", "preview"];
 
 
     viewStore.update((vs) => {
