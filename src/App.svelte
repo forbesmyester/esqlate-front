@@ -215,7 +215,7 @@
       </div>
 
 
-      <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" }>
+      <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" } style={$viewStore.statement.length ? "" : "display: none"}>
         <a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
         <div class="columns" style={ $viewStore.asPopup ? "" : "margin-top: 2rem"}>
           <div class="column col-auto modal-container code-popup" style="margin: auto">
