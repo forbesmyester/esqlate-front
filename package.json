@@ -7,7 +7,7 @@
     "debounce": "^1.2.0",
     "director": "^1.2.8",
     "esqlate-cache": "^1.0.1",
-    "esqlate-lib": "^1.0.2",
+    "esqlate-lib": "^1.0.3",
     "esqlate-waitfor": "^1.0.1",
     "markdown-it": "^10.0.0",
     "sirv-cli": "^0.4.4",
