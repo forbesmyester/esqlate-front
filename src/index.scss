@@ -53,30 +53,27 @@
 
 /* == Make SQL box appear in centre with content controlled width =========== */
 
+
+
 .code-popup {
     max-width: none;
     max-height: none;
     width: unset;
 
-    div.code-code div.code-form {
-        // background-color: $bg-color;
-        // padding: 1rem;
-    }
-
-    div.code-code {
-        background-color: #f7f8f9;
-        .line {
-            margin-bottom: 0.5rem;
-            &:last-of-type { margin-bottom: 0.5rem; }
-            span { white-space: pre; font-family: monospace; }
-        }
+    div.code-code .line {
+        margin-bottom: 0.5rem;
+        &:last-of-type { margin-bottom: 0.5rem; }
+        span { white-space: pre; font-family: monospace; }
     }
 
 }
 
+.no-modal .code-popup, .code-popup div.code {
+    background-color: #f7f8f9;
+}
+
 .no-modal .code-popup {
     box-shadow:none;
-    background-color: #f7f8f9;
     border: 1px solid #dadee4;
 }
 
@@ -85,7 +82,7 @@
         font-weight: bold;
         text-decoration: underline;
     }
-input[type="number"] { width: 4rem; }
+input[type="number"] { width: 6rem; }
 .no-modal .modal-overlay { display: none; font-size: 0px; }
 .modal-overlay { background: $bg-color !important; color: $bg-color !important; }
 .modal-container { padding: $unit-4; }

@@ -26,3 +26,12 @@ lighttpd -f lighttpd.conf -D
 As you can see there is nothing too weird there so feel free to use whatever HTTP/HTTPS server you wish.
 
 Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use Esqlate.
+
+# Credits
+
+ * Created using [Svelte](https://svelte.dev/).
+ * Some colors taken from [base-16](http://chriskempson.com/projects/base16/) and then mangled by me to make them ~~worse~~ different.
+ * TDD framework from [Tape](https://github.com/substack/tape).
+ * The routing is via [Flatiron Director](https://github.com/flatiron/director).
+ * Thank you Microsoft for joining the Open Source movement and giving us [TyeScript](https://www.typescriptlang.org/)
+ * This is my fifth-ish [Spectre CSS](https://picturepan2.github.io/spectre/) based project.
