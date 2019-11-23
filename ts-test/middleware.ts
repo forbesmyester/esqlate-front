@@ -4,7 +4,6 @@ import { getControlStore, urlSearchParamsToArguments } from "../ts-src/controls"
 import { get as getStoreValue, writable, Writable } from 'svelte/store';
 import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateStatement, EsqlateResult, EsqlateSuccessResult } from "esqlate-lib";
 import { EsqlateQueryComponent } from "../ts-src/types";
-import { Cache, Controls, URL } from "../ts-src/types";
 
 import test from 'tape';
 import {getInitilizeControls, getLoadDefinition, getInitialViewStore, ViewStore, loadResults} from '../ts-src/middleware';

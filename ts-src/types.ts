@@ -1,5 +1,4 @@
 import { EsqlateSuccessResult, EsqlateDefinition, EsqlateResult, EsqlateParameterSelect } from "esqlate-lib";
-import { Cache } from "esqlate-cache";
 
 export type URL = string;
 
@@ -9,11 +8,6 @@ export interface Controls { [k: string]: InputControl; }
 export interface OptionsForEsqlateParameterSelect {
     result: EsqlateResult;
     parameter: EsqlateParameterSelect;
-}
-
-export interface Cache {
-    definition: Cache<EsqlateDefinition>;
-    selectResult: Cache<EsqlateSuccessResult>;
 }
 
 export interface EsqlateQueryComponent {
