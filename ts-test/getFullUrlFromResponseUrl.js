@@ -13,8 +13,13 @@ assert.equal(
 );
 
 assert.equal(
-    getFullUrlFromResponseUrl("http://localhost/api", "/api2/request/fdsf"),
-    "http://localhost/api2/request/fdsf"
+    getFullUrlFromResponseUrl("http://localhost/api", "/request/fdsf"),
+    "http://localhost/api/request/fdsf"
+);
+
+assert.equal(
+    getFullUrlFromResponseUrl("http://localhost/api/", "/request/fdsf"),
+    "http://localhost/api/request/fdsf"
 );
 
 assert.equal(
