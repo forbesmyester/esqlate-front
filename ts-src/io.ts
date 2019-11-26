@@ -7,7 +7,11 @@ export function getURLSearchParams(): URLSearchParams {
 
 export function getApiRoot(): URL {
     const bodyElement = (document.querySelector("body") as HTMLBodyElement);
-    return (bodyElement.dataset.apiServer as string).replace(/\/$/, '');
+    const url = (bodyElement.dataset.apiServer as string).replace(/\/$/, '');
+    if (!url.match(/https?:/)) {
+        return getFullUrlFromResponseUrl(window.location.origin, url);
+    }
+    return url;
 }
 
 function throwOnInvalidStatusCodes(apiUrl: URL, resp: Response): Response {
