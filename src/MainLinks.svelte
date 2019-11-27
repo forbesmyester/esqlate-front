@@ -2,7 +2,7 @@
   import { asRow, normalizeLink, getLink } from "./controls";
   import Link from "./Link.svelte";
 
-  export let definition;
+  export let links;
   export let controls;
   export let result;
 
@@ -24,11 +24,11 @@
   }
 
   let args = [];
-  let links = [];
+  let the_links = [];
 
   $: args = getValuesFromControls(controls).concat(getValuesFromResults(result));
 
-  $: links = (definition.links || []).reduce(
+  $: the_links = (links || []).reduce(
     (acc, link) => {
       try {
         return acc.concat([getLink(
@@ -44,7 +44,7 @@
 </script>
 
 <div id="main_links">
-  {#each links as link}
+  {#each the_links as link}
   <Link link={link}/>
   {/each}
 </div>
