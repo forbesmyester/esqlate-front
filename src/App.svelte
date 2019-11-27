@@ -198,6 +198,14 @@
       </div>
     </div>
 
+    {#if !$viewStore.asPopup}
+      <MainLinks
+        links={ $viewStore.definition.top_links }
+        controls={ $viewStore.controls }
+        result={ $viewStore.result }
+        />
+    {/if}
+
     <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" } style={$viewStore.statement.length ? "" : "display: none"}>
       <a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
       <div class="columns" style={ $viewStore.asPopup ? "" : "margin-top: 2rem"}>
@@ -316,12 +324,12 @@
     {/if}
 
     {#if !$viewStore.asPopup}
+    <MainLinks
+      links={ $viewStore.definition.links }
+      controls={ $viewStore.controls }
+      result={ $viewStore.result }
+      />
     <div style="margin-top: 3em" class={ ($viewStore.asPopup) ? "in-popup" : "" }>
-      <MainLinks
-        definition={ $viewStore.definition }
-        controls={ $viewStore.controls }
-        result={ $viewStore.result }
-        />
       <ResultTable showDownloads={showDownloads} controls={$viewStore.controls} inPopup={false} definition={$viewStore.definition} result={$viewStore.result}/>
     </div>
   {/if}

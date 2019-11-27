@@ -1,12 +1,12 @@
 {
   "name": "esqlate-front",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "SQL based functional CRUD",
   "dependencies": {
     "debounce": "^1.2.0",
     "director": "^1.2.8",
     "esqlate-cache": "^1.0.1",
-    "esqlate-lib": "^1.0.3",
+    "esqlate-lib": "^1.0.4",
     "esqlate-waitfor": "^1.0.1",
     "markdown-it": "^10.0.0",
     "sirv-cli": "^0.4.5",
