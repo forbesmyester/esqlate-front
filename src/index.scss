@@ -78,10 +78,10 @@
 }
 
 /* == Misc ================================================================== */
-    a {
-        font-weight: bold;
-        text-decoration: underline;
-    }
+a {
+    font-weight: bold;
+    text-decoration: underline;
+}
 input[type="number"] { width: 6rem; }
 .no-modal .modal-overlay { display: none; font-size: 0px; }
 .modal-overlay { background: $bg-color !important; color: $bg-color !important; }
@@ -153,4 +153,7 @@ input, select, .input-popup {
         transform: translate(-50%, -50%);
         font-size: 288pt
     }
+}
+.showing-menu.off-canvas .off-canvas-overlay {
+    background: rgba(56, 56, 56, 0.03)
 }
