@@ -26,7 +26,7 @@
   let args = [];
   let the_links = [];
 
-  $: args = getValuesFromControls(controls).concat(getValuesFromResults(result));
+  $: args = getValuesFromControls(controls || {}).concat(getValuesFromResults(result));
 
   $: the_links = (links || []).reduce(
     (acc, link) => {
