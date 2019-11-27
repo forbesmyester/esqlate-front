@@ -1,10 +1,10 @@
-# Esqlate Front
+# eSQLate Front
 
-Esqlate Front provides a web interface for the [Esqlate Projects](https://github.com/forbesmyester/esqlate) API Server [Esqlate Server](https://github.com/forbesmyester/esqlate-server).
+eSQLate Front provides a web interface for the [eSQLate Projects](https://github.com/forbesmyester/esqlate) API Server [eSQLate Server](https://github.com/forbesmyester/esqlate-server).
 
 # Installation
 
-First install and configure [Esqlate Server](https://github.com/forbesmyester/esqlate-server).
+First install and configure [eSQLate Server](https://github.com/forbesmyester/esqlate-server).
 
 Then you must set up the following environmental variables:
 
@@ -25,7 +25,7 @@ lighttpd -f lighttpd.conf -D
 
 As you can see there is nothing too weird there so feel free to use whatever HTTP/HTTPS server you wish.
 
-Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use Esqlate.
+Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use eSQLate.
 
 # Credits
 
