@@ -6,6 +6,7 @@
   import ResultTable from "./ResultTable.svelte";
   import Parameter from "./Parameter.svelte";
   import Highlighter from "./Highlighter.svelte";
+  import MainLinks from "./MainLinks.svelte";
 
   export let pick;
   export let run;
@@ -197,7 +198,6 @@
       </div>
     </div>
 
-
     <div class={ ($viewStore.asPopup) ? "modal active in-popup" : "no-modal" } style={$viewStore.statement.length ? "" : "display: none"}>
       <a href="#close" on:click|preventDefault={cancel} class="modal-overlay" aria-label="Close">&nbsp;</a>
       <div class="columns" style={ $viewStore.asPopup ? "" : "margin-top: 2rem"}>
@@ -317,6 +317,11 @@
 
     {#if !$viewStore.asPopup}
     <div style="margin-top: 3em" class={ ($viewStore.asPopup) ? "in-popup" : "" }>
+      <MainLinks
+        definition={ $viewStore.definition }
+        controls={ $viewStore.controls }
+        result={ $viewStore.result }
+        />
       <ResultTable showDownloads={showDownloads} controls={$viewStore.controls} inPopup={false} definition={$viewStore.definition} result={$viewStore.result}/>
     </div>
   {/if}
