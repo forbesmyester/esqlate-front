@@ -114,8 +114,6 @@
 
 
   let args = [];
-  let links = [];
-  // let links = writable([]);
 
   function getValuesFromControls(currentControls) {
     return Object.getOwnPropertyNames(currentControls || {}).map(
@@ -136,19 +134,6 @@
 
   $: args = getValuesFromControls(controls).concat(getValuesFromResults(result));
 
-  $: links = (definition.links || []).reduce(
-    (acc, link) => {
-      try {
-        return acc.concat([getLink(
-          normalizeLink(args.map(({name}) => name), link),
-          asRow(args.map(({name}) => name), [], args)
-        )]);
-      } catch (e) {
-        return acc;
-      }
-    },
-    []
-  );
 
   function getFieldnames(myArgs) {
     return myArgs.map(({name}) => name).concat(
@@ -159,11 +144,6 @@
   afterUpdate(syncTable);
   window.onresize = debounce(syncTable, 200);
 </script>
-  <div id="main_links">
-    {#each links as link}
-    <Link link={link}/>
-    {/each}
-  </div>
 <div id={id}>
   <style id={ id + "-style" }>
   </style>
