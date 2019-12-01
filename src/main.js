@@ -65,16 +65,23 @@ function cancel() {
 function run() {
     const definitionName = getStoreValue(viewStore).definition.name;
 
-    console.log({gsv: getStoreValue(viewStore).controls, usp: urlSearchParamsToArguments(getURLSearchParams())});
     const qs = serializeValues(
         addControlStoreToEsqlateQueryComponents(
             getStoreValue(viewStore).controls,
             urlSearchParamsToArguments(getURLSearchParams())
         )
     );
-    console.log(qs);
     const route = `/${encodeURIComponent(definitionName)}/request?${qs}`
     router.setRoute(route);
+}
+
+
+function toggleShowingSql() {
+    viewStore.update((vs) => {
+        const value = !vs.showingSql;
+        window.localStorage.setItem('showingSql', value);
+        return {...vs, showingSql: value }
+    });
 }
 
 
@@ -112,7 +119,6 @@ function createRequest(ctx) {
         .then(resp => resp.json())
         .then((json) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${query}`;
-            // console.log(url);
             router.setRoute(url);
             return ctx;
         });
@@ -142,7 +148,6 @@ function waitForRequest(ctx) {
     return waitFor(getReady, calculateNewDelay)
         .then((loc) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(qry)}`;
-            // console.log(url);
             router.setRoute(url);
             return ctx;
         });
@@ -214,7 +219,12 @@ function setLoading(ctx) {
     return Promise.resolve(ctx);
 }
 
-const viewStore = writable(getInitialViewStore());
+const viewStore = writable({
+    ...getInitialViewStore(),
+    showingSql: (window.localStorage.getItem('showingSql') === "false") ?
+        false :
+        true
+});
 
 getRequest("/definition")
     .then(resp => resp.json())
@@ -229,7 +239,7 @@ const app = new App({
 	target: document.body,
 	props: {
         viewStore,
-
+        toggleShowingSql,
         run,
         popup,
         pick,

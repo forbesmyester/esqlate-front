@@ -11,6 +11,7 @@ interface LoadedDefinitionCtx { definition: EsqlateDefinition, params: { definit
 
 
 export interface ViewStore {
+    showingSql: boolean;
     showingMenu: boolean;
     showingDownload: boolean,
     definition: EsqlateDefinition;
@@ -24,6 +25,7 @@ export interface ViewStore {
 
 export function getInitialViewStore(): ViewStore {
     return {
+        showingSql: true,
         showingMenu: false,
         loading: false,
         showingDownload: false,
