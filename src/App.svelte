@@ -16,6 +16,8 @@
   export let viewStore;
   export let download;
   export let showDownloads;
+  export let toggleShowingSql;
+
 
   let getColorCache = new Map();
 
@@ -28,7 +30,6 @@
     return r;
   }
 
-  let showingSql = true;
   let md = new window.markdownit();
 
   let sidebarActive = false;
@@ -218,15 +219,15 @@
                 </div>
                 <div class="column col-3">
                   <label class="form-switch" style="float: right">
-                    <input type="checkbox" bind:checked={showingSql}>
-                    SQL<i class="form-icon"></i>
+                    <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
+                    SQL{$viewStore.showingSql}<i class="form-icon"></i>
                   </label>
                 </div>
               </div></div>
           </div>
 
           <div class="modal-body">
-            {#if showingSql}
+            {#if $viewStore.showingSql}
             <div class="container"><div class="col-gapless columns">
                 <div class="code-code column col-12" id="code-input-area">
                   {#each $viewStore.statement as line}
