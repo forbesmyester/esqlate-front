@@ -131,6 +131,12 @@
     return () => download(mimeType);
   }
 
+  function parameterIsAvailable(controls) {
+    return (p) => {
+      return controls.hasOwnProperty(p.name);
+    };
+  }
+
   afterUpdate(() => {
     if (getStoreValue(viewStore).definition && getStoreValue(viewStore).definition.title) {
       window.document.title = `eSQLate: ${getStoreValue(viewStore).definition.title}`;
@@ -251,7 +257,7 @@
               </div>
             </div>
             <div class="form-horizontal code-form">
-              {#each $viewStore.definition.parameters as parameter}
+              {#each $viewStore.definition.parameters.filter(parameterIsAvailable($viewStore.controls)) as parameter}
               <div class="form-group">
                 <div class="column col-5 col-sm-12">
                   <label class="form-label" for={ "input-" + parameter.name }>{parameter.name}</label>
