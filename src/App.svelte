@@ -220,7 +220,7 @@
                 <div class="column col-3">
                   <label class="form-switch" style="float: right">
                     <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
-                    SQL{$viewStore.showingSql}<i class="form-icon"></i>
+                    SQL<i class="form-icon"></i>
                   </label>
                 </div>
               </div></div>
