@@ -22,8 +22,3 @@ assert.equal(
     "http://localhost/api/request/fdsf"
 );
 
-assert.equal(
-    getFullUrlFromResponseUrl("http://localhost:8080/api", "/api2/request/fdsf"),
-    "http://localhost:8080/api2/request/fdsf"
-);
-
