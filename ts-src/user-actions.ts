@@ -29,9 +29,10 @@ export function getPopupLinkCreator(getURLSearchParams: () => URLSearchParams) {
             existingBack,
             {
                 url: backRoute,
-                name: definitionName,
+                def: definitionName,
                 fld: parameter.name,
-                disp: parameter.display_field
+                val: parameter.value_field,
+                dis: parameter.display_field
             }
         );
         const newQs = serializeValues(
@@ -60,11 +61,11 @@ export function pick(row: EsqlateSuccessResultRow, query: EsqlateQueryComponent[
             -1
         );
     }
-    const fieldIndex = getFieldIndex(back.fld);
-    const displayIndex = getFieldIndex(back.disp);
+    const valueIndex = getFieldIndex(back.val);
+    const displayIndex = getFieldIndex(back.dis);
 
-    if (fieldIndex == -1) {
-        throw new Error(`Return is a field that doesn't exist ${back.fld}`);
+    if (valueIndex == -1) {
+        throw new Error(`Return is a field that doesn't exist ${back.val}`);
     }
 
     const usp = new URLSearchParams(back.url.replace(/.*\?/, ''));
@@ -72,7 +73,7 @@ export function pick(row: EsqlateSuccessResultRow, query: EsqlateQueryComponent[
         .filter((esqArg) => esqArg.name != back.fld)
         .concat([{
             name: back.fld,
-            val: encodeURIComponent(row[fieldIndex]) + " " +
+            val: encodeURIComponent(row[valueIndex]) + " " +
                 encodeURIComponent(row[displayIndex])
         }]);
 
@@ -83,5 +84,5 @@ export function pick(row: EsqlateSuccessResultRow, query: EsqlateQueryComponent[
         )
     );
 
-    return `/${encodeURIComponent(back.name)}?${qs}`
+    return `/${encodeURIComponent(back.def)}?${qs}`
 }

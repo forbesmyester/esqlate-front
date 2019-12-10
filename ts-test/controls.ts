@@ -149,8 +149,10 @@ test("addBackValuesToControlStoreValue", (assert) => {
         { name: "_bname1", val: "bn2" } as EsqlateQueryComponent,
         { name: "_bfld0", val: "bf1" } as EsqlateQueryComponent,
         { name: "_bfld1", val: "bf2" } as EsqlateQueryComponent,
-        { name: "_bdisp0", val: "bd1" } as EsqlateQueryComponent,
-        { name: "_bdisp1", val: "bd2" } as EsqlateQueryComponent,
+        { name: "_bdis0", val: "bd1" } as EsqlateQueryComponent,
+        { name: "_bdis1", val: "bd2" } as EsqlateQueryComponent,
+        { name: "_bval0", val: "bv1" } as EsqlateQueryComponent,
+        { name: "_bval1", val: "bv2" } as EsqlateQueryComponent,
     ];
 
     const result = addBackValuesToControlStore(
@@ -167,8 +169,10 @@ test("addBackValuesToControlStoreValue", (assert) => {
         "_bname1": { value: "bn2" },
         "_bfld0": { value: "bf1" },
         "_bfld1": { value: "bf2" },
-        "_bdisp0": { value: "bd1" },
-        "_bdisp1": { value: "bd2" },
+        "_bdis0": { value: "bd1" },
+        "_bdis1": { value: "bd2" },
+        "_bval0": { value: "bv1" },
+        "_bval1": { value: "bv2" },
     };
 
     assert.deepEqual(
@@ -183,16 +187,18 @@ test("popBackFromArguments", (assert) => {
         { name: "c", val: "integer" } as EsqlateQueryComponent,
         { name: "_burl0", val: "bu1" } as EsqlateQueryComponent,
         { name: "_burl1", val: "%2Fbu2" } as EsqlateQueryComponent,
-        { name: "_bname0", val: "bn1" } as EsqlateQueryComponent,
-        { name: "_bname1", val: "bn2" } as EsqlateQueryComponent,
+        { name: "_bdef0", val: "bn1" } as EsqlateQueryComponent,
+        { name: "_bdef1", val: "bn2" } as EsqlateQueryComponent,
         { name: "_bfld0", val: "bf1" } as EsqlateQueryComponent,
         { name: "_bfld1", val: "bf2" } as EsqlateQueryComponent,
-        { name: "_bdips0", val: "bd1" } as EsqlateQueryComponent,
-        { name: "_bdisp1", val: "bd2" } as EsqlateQueryComponent,
+        { name: "_bdis0", val: "bd1" } as EsqlateQueryComponent,
+        { name: "_bdis1", val: "bd2" } as EsqlateQueryComponent,
+        { name: "_bval0", val: "bv1" } as EsqlateQueryComponent,
+        { name: "_bval1", val: "bv2" } as EsqlateQueryComponent,
     ];
     const result = popBackFromArguments(inputQuery);
 
-    assert.deepEqual(result, { name: "bn2", fld: "bf2", url: "/bu2", disp: "bd2" });
+    assert.deepEqual(result, { def: "bn2", fld: "bf2", url: "/bu2", dis: "bd2", val: "bv2" });
     assert.end();
 });
 
@@ -202,14 +208,16 @@ test("pushBackToControlStore", (assert) => {
         "c": { value: "integer" },
         "_burl0": { value: "bu1" },
         "_burl1": { value: "bu2" },
-        "_bname0": { value: "bn1" },
-        "_bname1": { value: "bn2" },
+        "_bdef0": { value: "bn1" },
+        "_bdef1": { value: "bn2" },
         "_bfld0": { value: "bf1" },
         "_bfld1": { value: "bf2" },
-        "_bdisp0": { value: "bd1" },
-        "_bdisp1": { value: "bd2" },
+        "_bdis0": { value: "bd1" },
+        "_bdis1": { value: "bd2" },
+        "_bval0": { value: "bv1" },
+        "_bval1": { value: "bv2" },
     };
-    const result = pushBackToControlStore(inputQuery, { name: "bn3", fld: "bf3", url: "bu3", disp: "bd3" });
+    const result = pushBackToControlStore(inputQuery, { def: "bn3", fld: "bf3", url: "bu3", dis: "bd3", val: "bv3" });
 
     assert.deepEqual(
         result,
@@ -218,15 +226,18 @@ test("pushBackToControlStore", (assert) => {
             "_burl0": { value: "bu1" },
             "_burl1": { value: "bu2" },
             "_burl2": { value: "bu3" },
-            "_bname0": { value: "bn1" },
-            "_bname1": { value: "bn2" },
-            "_bname2": { value: "bn3" },
+            "_bdef0": { value: "bn1" },
+            "_bdef1": { value: "bn2" },
+            "_bdef2": { value: "bn3" },
             "_bfld0": { value: "bf1" },
             "_bfld1": { value: "bf2" },
             "_bfld2": { value: "bf3" },
-            "_bdisp0": { value: "bd1" },
-            "_bdisp1": { value: "bd2" },
-            "_bdisp2": { value: "bd3" },
+            "_bdis0": { value: "bd1" },
+            "_bdis1": { value: "bd2" },
+            "_bdis2": { value: "bd3" },
+            "_bval0": { value: "bv1" },
+            "_bval1": { value: "bv2" },
+            "_bval2": { value: "bv3" },
         }
     );
     assert.end();

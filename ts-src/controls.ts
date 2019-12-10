@@ -125,8 +125,8 @@ export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateL
 
     return {
         class: e.hasOwnProperty("class") ? e.class as string : "",
-        text: e.text ? normalize(params, e["text"]) : normalize(params, e["href"]),
-        href: normalize(params, e["href"])
+        text: e.text ? process(e["text"]) : process(e["href"]),
+        href: process(e["href"])
     }
 
 }
@@ -198,8 +198,9 @@ export function addBackValuesToControlStore(qry: EsqlateQueryComponent[], csv: C
 type BackUrl = {
     url: string;
     fld: string; // Field to set upon return
-    name: string; // The definition name
-    disp: string; // The name of the field to show in the input upon return
+    def: string; // The definition name
+    dis: string; // The name of the field to show in the input upon return
+    val: string; // The value that the input is set to upon return.
 }
 
 
@@ -231,7 +232,7 @@ export function popBackFromArguments(qry: EsqlateQueryComponent[]): BackUrl {
             }
             return acc;
         },
-        { url: '', fld: '', name: '', disp: ''  }
+        { url: '', fld: '', def: '', dis: '', val: ''  }
     );
 }
 
@@ -251,8 +252,9 @@ export function pushBackToControlStore(qry: ControlStore, url: BackUrl): Control
     return {...qry,
         ["_burl" + (desiredNumber + 1)]: { value: url.url },
         ["_bfld" + (desiredNumber + 1)]: { value: url.fld },
-        ["_bname" + (desiredNumber + 1)]: { value: url.name },
-        ["_bdisp" + (desiredNumber + 1)]: { value: url.disp },
+        ["_bdef" + (desiredNumber + 1)]: { value: url.def },
+        ["_bdis" + (desiredNumber + 1)]: { value: url.dis },
+        ["_bval" + (desiredNumber + 1)]: { value: url.val },
     };
 }
 
