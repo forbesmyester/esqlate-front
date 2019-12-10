@@ -232,9 +232,15 @@
               </div></div>
           </div>
 
-          <div class="modal-body">
+          <div class="modal-body" style="overflow: unset">
             {#if $viewStore.showingSql}
-            <div class="container"><div class="col-gapless columns">
+            <div class="container">
+              <div class="col-gapless columns">
+                <div class="column-12" id="code-input-area">
+                  <div>{@html md.render("" + $viewStore.definition.description) }</div>
+                </div>
+              </div>
+              <div class="col-gapless columns">
                 <div class="code-code column col-12" id="code-input-area">
                   {#each $viewStore.statement as line}
                   <div class="line">
