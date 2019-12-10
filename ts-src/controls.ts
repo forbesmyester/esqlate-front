@@ -1,4 +1,4 @@
-import { normalize, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateResult, EsqlateLink, EsqlateStatementNormalized, EsqlateSuccessResult, EsqlateParameterString } from "esqlate-lib";
+import { rawParse, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateLink, EsqlateStatementNormalized, EsqlateSuccessResult, ParsedType } from "esqlate-lib";
 import { EsqlateQueryComponent, OptionsForEsqlateParameterSelect } from "./types";
 
 export type EsqlateLinkNormalized = {
@@ -119,9 +119,31 @@ export function serializeValues(values: EsqlateQueryComponent[]) {
 
 export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateLinkNormalized {
 
-    const params: EsqlateParameterString[] = namesOfFields.map(
-        (n) => ({ type: "string", name: n })
-    );
+    const params: Set<string> = new Set(namesOfFields.map((n) => n));
+
+    const parameterCounts: { [k: string]: number } = {
+        "noop": 1,
+        "popup": 2,
+    };
+
+    function process(textOrHref: string): EsqlateStatementNormalized {
+        const parsed = rawParse(textOrHref);
+        return parsed.map((par) => {
+            if (par.type == ParsedType.TEXT) {
+                return par.text;
+            }
+            if (parameterCounts[par.function] != par.variable.length) {
+                throw new Error(`Function ${par.function} takes ${parameterCounts[par.function]} parameters`);
+            }
+            par.variable.forEach((v) => {
+                if (!params.has(v)) {
+                    throw new Error("Variable ${v} in link template, but not a known variable");
+                }
+            });
+            return { name: par.variable[0], type: "string" }
+        });
+    }
+
 
     return {
         class: e.hasOwnProperty("class") ? e.class as string : "",

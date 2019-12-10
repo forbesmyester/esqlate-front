@@ -3,30 +3,87 @@ import { getControlStore, normalizeLink, getLink, asRow, addBackValuesToControlS
 import { EsqlateSuccessResult, EsqlateLink, EsqlateParameterString, EsqlateParameterInteger, EsqlateParameterSelect, EsqlateDefinition, EsqlateArgument } from 'esqlate-lib';
 import { EsqlateQueryComponent } from '../ts-src/types';
 
-test("normalizeEsqlateLink", (assert) => {
+test("normalizeLink", (assert) => {
 
-    const input: EsqlateLink = {
-        href: "#request/customers?country=${country}&abc=$num"
-    }
+    // Just HREF
+    assert.deepEqual(
+        normalizeLink(
+            ["country", "num"],
+            { href: "#request/customers?country=${country}&abc=$num" }
+        ),
+        {
+            class: "",
+            href: [
+                "#request/customers?country=",
+                { type: "string", "name": "country" },
+                "&abc=",
+                { type: "string", "name": "num" },
+            ],
+            text: [
+                "#request/customers?country=",
+                { type: "string", "name": "country" },
+                "&abc=",
+                { type: "string", "name": "num" },
+            ]
+        }
+    );
 
-    const expected: EsqlateLinkNormalized = {
-        class: "",
-        href: [
-            "#request/customers?country=",
-            { type: "string", "name": "country" },
-            "&abc=",
-            { type: "string", "name": "num" },
-        ],
-        text: [
-            "#request/customers?country=",
-            { type: "string", "name": "country" },
-            "&abc=",
-            { type: "string", "name": "num" },
-        ]
-    };
+    // With Text
+    assert.deepEqual(
+        normalizeLink(
+            ["country", "num"],
+            {
+                href: "#request/customers?country=${noop country}&abc=$num",
+                text: "Hello $num"
+            }
+        ),
+        {
+            class: "",
+            href: [
+                "#request/customers?country=",
+                { type: "string", "name": "country" },
+                "&abc=",
+                { type: "string", "name": "num" },
+            ],
+            text: [
+                "Hello ",
+                { type: "string", "name": "num" },
+            ]
+        }
+    );
 
-    assert.plan(1);
-    assert.deepEqual(normalizeLink(["country", "num"], input), expected);
+    // Wrong param count for noop
+    assert.throws(() => {
+        normalizeLink(
+            ["country", "num"],
+            { href: "#request/customers?country=${noop a country}&abc=$num" }
+        );
+    });
+
+    // Unknown variable
+    assert.throws(() => {
+        normalizeLink(
+            ["country", "num"],
+            { href: "#request/customers?country=${aaa}&abc=$num" }
+        );
+    });
+
+    // Unknown function
+    assert.throws(() => {
+        normalizeLink(
+            ["country", "num"],
+            { href: "#request/customers?country=${zzz aaa}&abc=$num" }
+        );
+    });
+
+    // Wrong param count for popup
+    assert.throws(() => {
+        normalizeLink(
+            ["country", "num"],
+            { href: "#request/customers?country=${popup aaa}&abc=$num" }
+        );
+    });
+
     assert.end();
 
 });
