@@ -44,7 +44,7 @@ test('getPopupLinkCreator', (assert) => {
 
     const result = popup(parameterName, definition, controlStore);
 
-    const expected = "/customer_search?_burl0=%252Fwhere_i_was%253Fsearch_string%253DRob%2526country%253DArgentina&_bfld0=customer_id&_bname0=where_i_was&_bdisp0=company_name";
+    const expected = "/customer_search?_burl0=%252Fwhere_i_was%253Fsearch_string%253DRob%2526country%253DArgentina&_bfld0=customer_id&_bdef0=where_i_was&_bdis0=company_name&_bval0=customer_id_value_field";
 
 
     assert.is(result, expected);
@@ -59,12 +59,14 @@ test('pick', (assert) => {
         { name: "c", val: "integer" } as EsqlateQueryComponent,
         { name: "_burl0", val: "bu1" } as EsqlateQueryComponent,
         { name: "_burl1", val: "/order_list?min_price=4" } as EsqlateQueryComponent,
-        { name: "_bname0", val: "bn1" } as EsqlateQueryComponent,
-        { name: "_bname1", val: "order_list" } as EsqlateQueryComponent,
+        { name: "_bdef0", val: "bn1" } as EsqlateQueryComponent,
+        { name: "_bdef1", val: "order_list" } as EsqlateQueryComponent,
         { name: "_bfld0", val: "bf1" } as EsqlateQueryComponent,
-        { name: "_bfld1", val: "company_id" } as EsqlateQueryComponent,
-        { name: "_bdisp0", val: "bd1" } as EsqlateQueryComponent,
-        { name: "_bdisp1", val: "company_name" } as EsqlateQueryComponent,
+        { name: "_bfld1", val: "f_company_id" } as EsqlateQueryComponent,
+        { name: "_bdis0", val: "bd1" } as EsqlateQueryComponent,
+        { name: "_bdis1", val: "company_name" } as EsqlateQueryComponent,
+        { name: "_bval0", val: "bv1" } as EsqlateQueryComponent,
+        { name: "_bval1", val: "company_id" } as EsqlateQueryComponent,
     ];
 
     const fields: EsqlateSuccessResult["fields"] = [
@@ -73,7 +75,7 @@ test('pick', (assert) => {
     ];
 
     const result = pick(row, query, fields);
-    const expected = "/order_list?min_price=4&company_id=OCEAN%20Ocean%2520Shipping%2520International";
+    const expected = "/order_list?min_price=4&f_company_id=OCEAN%20Ocean%2520Shipping%2520International";
 
     assert.is(result, expected);
     assert.end();
