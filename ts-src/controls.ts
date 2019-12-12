@@ -1,9 +1,16 @@
 import { rawParse, EsqlateArgument, EsqlateDefinition, EsqlateFieldDefinition, EsqlateParameter, EsqlateParameterSelect, EsqlateLink, EsqlateStatementNormalized, EsqlateSuccessResult, ParsedType } from "esqlate-lib";
 import { EsqlateQueryComponent, OptionsForEsqlateParameterSelect } from "./types";
 
+export interface EsqlateLinkVariable {
+    fun: string;
+    namesOfFields: string[];
+}
+
+type EsqlateLinkAttribute = (EsqlateLinkVariable | string)[];
+
 export type EsqlateLinkNormalized = {
-    text: EsqlateStatementNormalized;
-    href: EsqlateStatementNormalized;
+    text: EsqlateLinkAttribute;
+    href: EsqlateLinkAttribute;
     class: string;
 }
 
@@ -126,7 +133,7 @@ export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateL
         "popup": 2,
     };
 
-    function process(textOrHref: string): EsqlateStatementNormalized {
+    function process(textOrHref: string): EsqlateLinkAttribute {
         const parsed = rawParse(textOrHref);
         return parsed.map((par) => {
             if (par.type == ParsedType.TEXT) {
@@ -140,7 +147,7 @@ export function normalizeLink(namesOfFields: string[], e: EsqlateLink): EsqlateL
                     throw new Error("Variable ${v} in link template, but not a known variable");
                 }
             });
-            return { name: par.variable[0], type: "string" }
+            return { namesOfFields: par.variable, fun: par.function }
         });
     }
 
@@ -174,14 +181,39 @@ function renderLinkText(s: EsqlateLinkNormalized["text"], row: EsqlateRow, escap
     if (typeof s == "string") {
         throw new Error("renderLink: Requires normalizeLink to be called first: " + s);
     }
+
+    function getParameters(nofs: EsqlateLinkVariable["namesOfFields"]): string[] {
+        return nofs.map((nof) => {
+            return "" + row[nof] || "";
+        });
+    }
+
+    function callF(ela: EsqlateLinkVariable): string {
+        if (ela.fun == "noop") {
+            return getParameters(ela.namesOfFields)[0];
+        }
+        if (ela.fun == "popup") {
+            const params = getParameters(ela.namesOfFields);
+            if (params.length != 2) {
+                throw new Error(
+                    "generation of a popup link requires 2 params"
+                );
+            }
+            return encodeURIComponent(params[0]) + " " +
+                encodeURIComponent(params[1]);
+        }
+        throw new Error(`Unknown function '${ela.fun}'`);
+    }
+
     return s.reduce(
         (acc: string, ei) => {
             if (typeof ei == "string") {
                 return acc = acc + ei;
             }
-            return escape ?
-                (acc + encodeURIComponent(row[ei.name])) :
-                acc + row[ei.name];
+            if (escape) {
+                return acc + encodeURIComponent(callF(ei));
+            }
+            return acc + callF(ei);
         },
         ""
     );

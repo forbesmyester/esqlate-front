@@ -15,15 +15,15 @@ test("normalizeLink", (assert) => {
             class: "",
             href: [
                 "#request/customers?country=",
-                { type: "string", "name": "country" },
+                { fun: "noop", namesOfFields: ["country"] },
                 "&abc=",
-                { type: "string", "name": "num" },
+                { fun: "noop", namesOfFields: ["num"] },
             ],
             text: [
                 "#request/customers?country=",
-                { type: "string", "name": "country" },
+                { fun: "noop", namesOfFields: ["country"] },
                 "&abc=",
-                { type: "string", "name": "num" },
+                { fun: "noop", namesOfFields: ["num"] },
             ]
         }
     );
@@ -41,13 +41,37 @@ test("normalizeLink", (assert) => {
             class: "",
             href: [
                 "#request/customers?country=",
-                { type: "string", "name": "country" },
+                { fun: "noop", namesOfFields: ["country"] },
                 "&abc=",
-                { type: "string", "name": "num" },
+                { fun: "noop", namesOfFields: ["num"] },
             ],
             text: [
                 "Hello ",
-                { type: "string", "name": "num" },
+                { fun: "noop", namesOfFields: ["num"] },
+            ]
+        }
+    );
+
+    // As Popup
+    assert.deepEqual(
+        normalizeLink(
+            ["country_id", "country", "num"],
+            {
+                href: "#request/customers?country=${popup country_id country}&abc=$num",
+                text: "Hello $num"
+            }
+        ),
+        {
+            class: "",
+            href: [
+                "#request/customers?country=",
+                { fun: "popup", namesOfFields: ["country_id", "country"] },
+                "&abc=",
+                { fun: "noop", namesOfFields: ["num"] },
+            ],
+            text: [
+                "Hello ",
+                { fun: "noop", namesOfFields: ["num"] },
             ]
         }
     );
@@ -93,24 +117,26 @@ test("getLink", (assert) => {
     const link: EsqlateLinkNormalized = {
         href: [
             "#request/customers?country=",
-            { type: "string", "name": "country" },
+            { fun: "popup", namesOfFields: ["country_id", "country_name"] },
             "&abc=123",
         ],
         text: [
             "In ",
-            { type: "string", name: "display" }
+            { fun: "noop", namesOfFields: ["display"] }
         ],
         class: "zz"
     };
 
     const expected = {
         class: "zz",
-        href: "#request/customers?country=H%26M&abc=123",
+        href: "#request/customers?country=H%2526M%20H%2526M%2520Store&abc=123",
         text: "In H and M"
     };
 
-    assert.plan(1);
-    assert.deepEqual(getLink(link, { country: "H&M", display: "H and M" }), expected);
+    assert.deepEqual(
+        getLink(link, { country_id: "H&M", country_name: "H&M Store", display: "H and M" }),
+        expected
+    );
     assert.end();
 });
 
@@ -119,7 +145,7 @@ test('asRow', (assert) => {
     assert.deepEqual(
         asRow(
             ["hi", 4],
-            [{name: "greeting", type: "string"}, {name: "age", type: "integer"}],
+            [{"name": "greeting", type: "string"}, {name: "age", type: "integer"}],
             [{name: "gender", val: "F"}]
         ),
         { greeting: "hi", age: 4, gender: "F" }
