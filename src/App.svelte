@@ -12,6 +12,7 @@
   export let run;
   export let cancelDownload;
   export let cancel;
+  export let empty;
   export let popup;
   export let viewStore;
   export let download;
@@ -282,12 +283,13 @@
             </div>
             {/if}
           </div>
-            {#if $viewStore.asPopup}
+          {#if $viewStore.asPopup}
 
           <div class="modal-footer">
             <div class="container"><div class="col-gapless columns"><div class="column col-12">
             {#if $viewStore.asPopup}
             <button class="btn btn-link" on:click={cancel}>Cancel</button>
+            <button class="btn" on:click={empty}>Select Empty Value</button>
             {/if}
             <button class={ "btn btn-primary " + buttonClass($viewStore.definition.statement_type) } on:click={run}>
               { $viewStore.definition.statement_type || "EXECUTE" }
