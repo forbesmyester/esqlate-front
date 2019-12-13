@@ -56,6 +56,16 @@ function showDownloads() {
     );
 }
 
+function empty() {
+    const route = runPick(
+        [],
+        urlSearchParamsToArguments(getURLSearchParams()),
+        getStoreValue(viewStore).result.fields,
+        true
+    );
+    router.setRoute(route);
+}
+
 function cancel() {
     router.setRoute(popBackFromArguments(
         urlSearchParamsToArguments(getURLSearchParams())
@@ -243,6 +253,7 @@ const app = new App({
         run,
         popup,
         pick,
+        empty,
         cancel,
         cancelDownload,
         showDownloads,
