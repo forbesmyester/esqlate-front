@@ -43,9 +43,16 @@ export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateQueryCo
 export function addControlStoreToEsqlateQueryComponents(cs: ControlStore, esqArg: EsqlateQueryComponent[]): EsqlateQueryComponent[] {
     const fromCs: Set<String> = new Set(Object.getOwnPropertyNames(cs));
 
+    function getValue(o: ControlStoreItem) {
+        if (!o.hasOwnProperty("value")) {
+            return "";
+        }
+        return o.value;
+    }
+
     return Object.getOwnPropertyNames(cs).reduce(
         (acc: EsqlateQueryComponent[], k: string) => {
-            return acc.concat([{ name: k, val: cs[k].value }]);
+            return acc.concat([{ name: k, val: getValue(cs[k]) }]);
         },
         esqArg.filter(({ name }) => !fromCs.has(name))
     );
@@ -96,7 +103,7 @@ export function getControlStore(
     }
 
     function reducer(acc: ControlStore, item: EsqlateParameter): ControlStore {
-        let value: any = item.type == "integer" ? 0 : "";
+        let value: any = "";
         if (inputValues.has(item.name)) {
             value = inputValues.get(item.name);
         }
@@ -120,7 +127,8 @@ export function getControlStore(
 
 export function serializeValues(values: EsqlateQueryComponent[]) {
     return values.map((ea) => {
-        return `${encodeURIComponent(ea.name)}=${encodeURIComponent(ea.val)}`;
+        const v = (ea.val === undefined) ? "" : encodeURIComponent(ea.val);
+        return `${encodeURIComponent(ea.name)}=${v}`;
     }).join('&');
 }
 
@@ -322,13 +330,14 @@ export function queryComponentsToArguments(params: EsqlateDefinition["parameters
     );
 
     const mapper = (qc: EsqlateQueryComponent) => {
+        const v = qc.val === undefined ? "" : qc.val;
         if (popups.has(qc.name)) {
             const value = decodeURIComponent(
-                ("" + qc.val).replace(/ .*/, "")
+                ("" + v).replace(/ .*/, "")
             );
             return { name: qc.name, value };
         }
-        return { name: qc.name, value: qc.val }
+        return { name: qc.name, value: v }
     };
 
     const filterer = (a: EsqlateArgument) => {

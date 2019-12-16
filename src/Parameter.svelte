@@ -28,14 +28,23 @@
   }
 
   function isDateOk() {
+    if ((parameter.empty_string_is_null) && (control.value == "")) {
+      return true;
+    }
     return ("" + control.value).match(/\d\d\d\d\-\d\d-\d\d/);
   }
 
   function isIntegerOk() {
+    if ((parameter.empty_string_is_null) && (control.value == "")) {
+      return true;
+    }
     return ("" + parseInt(control.value) == control.value)
   }
 
   function isDecimalOk() {
+    if ((parameter.empty_string_is_null) && (control.value == "")) {
+      return true;
+    }
     return ("" + control.value).match(/^-?(0|[1-9]\d*)(\.\d+)?$/)
   }
 
@@ -67,6 +76,9 @@
 {:else if parameter.type == "select"}
   {#if control.options }
     <select data-highlight-fields={JSON.stringify(parameter.highlight_fields)} on:focus={onfocus} on:blur={onblur} id={ "input-" + parameter.name } name={parameter.name} bind:value={control.value} data-parameter-name={parameter.name}>
+      {#if parameter.empty_string_is_null}
+        <option value=""></option>
+      {/if}
       {#each control.options as opt}
         <option value={opt.value}>{opt.display}</option>
       {/each}

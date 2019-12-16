@@ -13,4 +13,4 @@ package-lock.json
 /lighttpd.conf
 /public
 /src/middleware.js
-/env.json
+/env.ndjson

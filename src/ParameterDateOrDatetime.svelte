@@ -14,11 +14,17 @@ export let onfix;
 
 const dispatchNewValue = createEventDispatcher();
 
+function emptyCheck() {
+  if (!parameter.empty_string_is_null) {
+    control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+  }
+}
+
 function onchangedate({ target: { value: evtValue} }) {
     try {
       control = processDateTime({ ...control, date: evtValue }, "DATE");
       dispatchNewValue("newvalue", { name: parameter.name, control });
-      control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+      emptyCheck();
     } catch (e) {
       onerror(parameter.name, parameter.highlight_fields);
     }
@@ -28,13 +34,13 @@ function onchangetime({ target: { value: evtValue } }) {
     try {
       control = {...processDateTime({ ...control, time: evtValue }, "TIME")};
       dispatchNewValue("newvalue", { name: parameter.name, control });
-      control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+      emptyCheck();
     } catch (e) {
       onerror(parameter.name, parameter.highlight_fields);
     }
 }
 
-control.value != "" ?  onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+emptyCheck();
 
 </script>
 <input data-highlight-fields={JSON.stringify(parameter.highlight_fields)}

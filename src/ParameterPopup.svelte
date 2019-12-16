@@ -11,7 +11,11 @@ function getDisplayValue(controlValue) {
   );
 }
 
-control.value != "" ? onfix(parameter.name, parameter.highlight_fields) : onerror(parameter.name, parameter.highlight_fields);
+if (!parameter.empty_string_is_null) {
+  control.value != "" ?
+    onfix(parameter.name, parameter.highlight_fields) :
+    onerror(parameter.name, parameter.highlight_fields);
+}
 
 </script>
 <strong>

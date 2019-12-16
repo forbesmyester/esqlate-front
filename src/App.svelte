@@ -283,7 +283,6 @@
             </div>
             {/if}
           </div>
-          {#if $viewStore.asPopup}
 
           <div class="modal-footer">
             <div class="container"><div class="col-gapless columns"><div class="column col-12">
@@ -297,6 +296,7 @@
             </div></div></div>
           </div>
 
+          {#if $viewStore.asPopup}
           <div class="modal-body">
           <ResultTable controls={$viewStore.controls} pick={pick} inPopup={true} definition={$viewStore.definition} result={$viewStore.result}/>
           </div>
