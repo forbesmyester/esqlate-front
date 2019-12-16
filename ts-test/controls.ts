@@ -188,7 +188,7 @@ test('getControlStore', (assert) => {
             [ { parameter: selectParameter, result } ]
         ),
         {
-            "a": { value: 0 },
+            "a": { value: "" },
             "b": { value: "four" },
             "c": {
                 value: "Argentina",

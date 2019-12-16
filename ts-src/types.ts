@@ -12,5 +12,5 @@ export interface OptionsForEsqlateParameterSelect {
 
 export interface EsqlateQueryComponent {
   name: string;
-  val: number | string | number | boolean;
+  val?: number | string | number | boolean;
 }
