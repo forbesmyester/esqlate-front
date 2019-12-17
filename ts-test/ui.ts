@@ -92,10 +92,10 @@ test("processDateTime Date", (assert) => {
 test('getHightlightPositions', (assert) => {
     assert.deepEqual(
         getHightlightPositions(
-            [ "first_name" ],
-            "insert into x (first_name, first_name, last_name)"
+            [ "title" ],
+            "title insert into x (title, title, first_name, last_name, title_of_book) x_title; title"
         ),
-        [{ begin: 15, end: 25 }, { begin: 27, end: 37 }]
+        [{ begin: 0, end: 5 }, { begin: 21, end: 26 }, { begin: 28, end: 33 }, { begin: 82, end: 87 }]
     );
     assert.end();
 
