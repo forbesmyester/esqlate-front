@@ -238,7 +238,9 @@
             <div class="container">
               <div class="col-gapless columns">
                 <div class="column-12" id="code-input-area">
+                  {#if $viewStore.definition.description }
                   <div>{@html md.render("" + $viewStore.definition.description) }</div>
+                  {/if}
                 </div>
               </div>
               <div class="col-gapless columns">
@@ -260,7 +262,9 @@
             {:else}
             <div class="col-gapless columns code-description">
               <div class="column-12" id="code-input-area">
+                {#if $viewStore.definition.description }
                 <div>{@html md.render("" + $viewStore.definition.description) }</div>
+                {/if}
               </div>
             </div>
             <div class="form-horizontal code-form">
