@@ -153,9 +153,6 @@
     }
   })
 
-  $: if (($viewStore.result || {}).status == "error") {
-    esqlateShowToastError($viewStore.result.message);
-  }
 
 </script>
 

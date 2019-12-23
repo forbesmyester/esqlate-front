@@ -332,6 +332,13 @@ var routes = {
         getLoadDefinition(cacheDefinition, viewStore),
         getInitilizeControls(viewStore, getURLSearchParams, cacheCompleteResultForSelect),
         loadResults,
+        (ctx) => {
+            const result = getStoreValue(viewStore).result;
+            if (result && result.message) {
+                esqlateShowToastError(result.message);
+            }
+            return Promise.resolve(ctx);
+        },
         finishedLoading,
     ]),
 };
