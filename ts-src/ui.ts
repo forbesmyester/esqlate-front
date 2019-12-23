@@ -77,14 +77,22 @@ export interface HighlightPosition {
 export function getHightlightPositions(params: EsqlateParameter["highlight_fields"], bitOfSql: string): HighlightPosition[] {
 
     function findAll(s: string, substring: string) {
-        let lastPos = 0;
+        let lastPos = -1;
         let ret: number[] = [];
+
         while (!ret.some((r) => r === -1)) {
             lastPos = s.indexOf(substring, lastPos + 1)
             ret.push(lastPos);
         }
+
         return ret
             .filter((r) => r !== -1)
+            .filter((r) => {
+                return (
+                    ((r == 0) || (!bitOfSql[r - 1].match(/[a-z0-9_]/))) &&
+                    ((r + substring.length >= bitOfSql.length) || (!bitOfSql[r + substring.length].match(/[a-z0-9_]/)))
+                );
+            })
             .map((r) => {
                 return { begin: r, end: substring.length + r };
             });
