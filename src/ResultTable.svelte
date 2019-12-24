@@ -15,75 +15,23 @@
 
   const id = inPopup ? "in-popup-results" : "out-popup-results";
 
-
-  function resizeResultHeight() {
-    // Perhaps set height
-    if (Array.from(document.querySelectorAll(`#${id} .results-body tr:first-child td`)).length) {
-      let desiredHeight = window.innerHeight - (document.querySelector(`#${id} .results-body tr:first-child td`).top);
-      const bottomTrPos = document.querySelector(`#${id} .results-body tr:last-child td`).getBoundingClientRect().bottom;
-      let scrollDesirable = bottomTrPos > window.innerHeight;
-      if (inPopup && bottomTrPos > window.innerHeight - 150) {
-        desiredHeight = 300;
-        scrollDesirable = true;
-      }
-      if ((desiredHeight > 200) && scrollDesirable) {
-        return [
-          `#${id} .results-body { display: block; max-height: ${desiredHeight}px; overflow-y: scroll; }`,
-          `#${id} .results-head { display: block; overflow-y: scroll; }`,
-        ];
-      }
-    }
-    return []
-  }
-
-  function resetStylesheet() {
-    const stylesheet = document.getElementById(id + "-style").sheet;
-    for (let i = 0; i < stylesheet.rules.length; i++) {
-      stylesheet.removeRule(0);
-    }
-    return stylesheet;
-  }
-
-
   function syncTable() {
+
+    function resetStylesheet() {
+      const stylesheet = document.getElementById(id + "-style").sheet;
+      for (let i = 0; i < stylesheet.rules.length; i++) {
+        stylesheet.removeRule(0);
+      }
+      return stylesheet;
+    }
 
     const stylesheet = resetStylesheet();
 
-    resizeResultHeight().map((rule) => {
-      stylesheet.insertRule(rule);
-    });
-
-
-    const tds = Array.from(document.querySelectorAll(`#${id} .results-body tr:first-child td`))
-      .map((td) => td.getBoundingClientRect());
-    const ths = Array.from(document.querySelectorAll(`#${id} .results-head th`))
-      .map((th) => th.getBoundingClientRect());
-    const initialWidths = tds.map(
-      (_td, i) => tds[i].width > ths[i].width ? tds[i].width : ths[i].width
-    );
     const requiredWidth = document.getElementById("code-input-area") ?
       document.getElementById("code-input-area").getBoundingClientRect().width :
-      0;
-    const currentWidth = initialWidths.reduce((acc, w) => acc + w, 0)
-    const extraWidth = (currentWidth < requiredWidth) ? requiredWidth - currentWidth : 0;
-    const widths = tds.map((_td, i) => {
-      if (i == 0) {
-        return Math.floor(initialWidths[i] +
-          (extraWidth / initialWidths.length) +
-          (extraWidth % initialWidths.length));
-      }
-      return Math.floor(initialWidths[i] + (extraWidth / initialWidths.length));
-    });
+      640;
 
-
-    // Set widths
-    for (let i = 0; i < widths.length; i++) {
-      // TODO: Check if we need to add width to match code
-      const cssRule = `#${id} .results-body td:nth-child(${i + 1}), #${id} .results-head th:nth-child(${i + 1}) {width: ${widths[i]}px}`;
-      stylesheet.insertRule(cssRule);
-    }
-
-    stylesheet.insertRule(`#${id} { max-width: ${window.innerWidth - 32} }`);
+    stylesheet.insertRule(`#table-holder { min-width: ${requiredWidth}px }`);
   }
 
   function alignment(field) {
@@ -144,12 +92,25 @@
   afterUpdate(syncTable);
   window.onresize = debounce(syncTable, 200);
 </script>
+<style>
+  #table-holder {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  #table-holder table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #dadee4;
+  }
+</style>
 <div id={id}>
   <style id={ id + "-style" }>
   </style>
   {#if result && ((result.status == "complete") || (result.status == "preview"))}
   <div class="columns">
     <div class="column col-auto" style="margin: 0 auto">
+      <div id="table-holder">
       <table class="results-head table table-striped table-hover" style="padding-bottom: 0; margin: 0">
         <thead>
           <tr>
@@ -161,8 +122,6 @@
             {/if}
           </tr>
         </thead>
-      </table>
-      <table class="results-body table table-striped table-hover" style="margin: 0">
         <tbody>
           {#each result.rows || [] as row}
           <tr>
@@ -194,6 +153,7 @@
           {/each}
         </tbody>
       </table>
+      </div>
       {#if inPopup}
         {#if !result.full_data_set }
         <div class="toast toast-warning toast-resultset-warning">

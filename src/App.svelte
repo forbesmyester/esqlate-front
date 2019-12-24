@@ -234,7 +234,7 @@
             {#if $viewStore.showingSql}
             <div class="container">
               <div class="col-gapless columns">
-                <div class="column-12" id="code-input-area">
+                <div class="column-12" id="code-description-area">
                   {#if $viewStore.definition.description }
                   <div>{@html md.render("" + $viewStore.definition.description) }</div>
                   {/if}
