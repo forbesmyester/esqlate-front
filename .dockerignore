@@ -1,5 +1,4 @@
-bundle.js
-env.json
+env.ndjson
 .git
 lighttpd.conf
 node_modules
