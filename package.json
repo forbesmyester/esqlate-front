@@ -1,6 +1,6 @@
 {
   "name": "esqlate-front",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "SQL based functional CRUD",
   "dependencies": {
     "debounce": "^1.2.0",
@@ -34,7 +34,7 @@
     "build": "npm run-script build-templates && npm run-script build-scss && npm run-script build-ts && npm run-script build-third-party && ./node_modules/.bin/rollup -c",
     "build-rollup": "./node_modules/.bin/rollup -c",
     "autobuild": "./node_modules/.bin/rollup -c -w",
-    "build-templates": "cat src/index.tpl.html | envsubst > public/index.html",
+    "build-templates": "mkdir -p public && cat src/index.tpl.html | envsubst > public/index.html",
     "build-scss": "./node_modules/.bin/node-sass src/index.scss > public/index.css",
     "dev": "./node_modules/.bin/run-p start:dev autobuild",
     "start": "lighttpd -D -f ./lighttpd.conf",
