@@ -11,6 +11,6 @@ package-lock.json
 /src/ui.js
 /ts-build
 /lighttpd.conf
-/public
+/public/index.html
 /src/middleware.js
 /env.ndjson
