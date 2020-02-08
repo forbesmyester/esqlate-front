@@ -51,6 +51,7 @@
   const formatters = {
     "date": (s) => dateFormatter.format(new Date(s)),
     "timestamp": (s) => timestampFormatter.format(new Date(s)),
+    "jsonb": (s) => JSON.stringify(s),
   }
 
   function getFormatter(sqlType) {
