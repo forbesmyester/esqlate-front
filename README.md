@@ -27,6 +27,12 @@ As you can see there is nothing too weird there so feel free to use whatever HTT
 
 Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use eSQLate.
 
+## Contributers
+
+Thank you
+
+ * @richrd - Support for displaying JSONB #1
+
 ## Credits
 
  * Created using [Svelte](https://svelte.dev/).
