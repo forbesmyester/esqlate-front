@@ -95,6 +95,15 @@ function toggleShowingSql() {
 }
 
 
+function toggleShowingExtendedDisplay() {
+    viewStore.update((vs) => {
+        const value = !vs.showingExtendedDisplay;
+        window.localStorage.setItem('showingExtendedDisplay', value);
+        return {...vs, showingExtendedDisplay: value }
+    });
+}
+
+
 function hideResults(ctx) {
     viewStore.update((vs) => ({...vs, result: false }));
     return Promise.resolve(ctx);
@@ -233,7 +242,10 @@ const viewStore = writable({
     ...getInitialViewStore(),
     showingSql: (window.localStorage.getItem('showingSql') === "false") ?
         false :
-        true
+        true,
+    showingExtendedDisplay: (window.localStorage.getItem('showingExtendedDisplay') === "false") ?
+        false :
+        true,
 });
 
 getRequest("/definition")
@@ -250,6 +262,7 @@ const app = new App({
 	props: {
         viewStore,
         toggleShowingSql,
+        toggleShowingExtendedDisplay,
         run,
         popup,
         pick,

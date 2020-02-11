@@ -18,6 +18,7 @@
   export let download;
   export let showDownloads;
   export let toggleShowingSql;
+  export let toggleShowingExtendedDisplay;
 
 
   let getColorCache = new Map();
@@ -156,7 +157,11 @@
 
 </script>
 
-<div class={ $viewStore.showingMenu ? "showing-menu off-canvas" : "off-canvas" }>
+<div
+  class="off-canvas"
+  class:showing-menu={ $viewStore.showingMenu }
+  class:extended-display={ $viewStore.showingExtendedDisplay }
+>
   <!-- off-screen toggle button -->
   <a class="off-canvas-toggle btn btn-link"
     href="#sidebar-id"
@@ -225,6 +230,10 @@
                   <label class="form-switch" style="float: right">
                     <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
                     SQL<i class="form-icon"></i>
+                  </label>
+                  <label class="form-switch" style="float: right">
+                    <input type="checkbox" checked={$viewStore.showingExtendedDisplay ? "checked" : ""} on:click={toggleShowingExtendedDisplay}>
+                    Extended Display<i class="form-icon"></i>
                   </label>
                 </div>
               </div></div>

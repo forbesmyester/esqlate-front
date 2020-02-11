@@ -156,3 +156,67 @@ input, select, .input-popup {
 .showing-menu.off-canvas .off-canvas-overlay {
     background: rgba(56, 56, 56, 0.03)
 }
+
+#table-holder table td {
+    // Align table cell contents to top when some cells are more than one line high
+    vertical-align: top;
+}
+
+.off-canvas-content {
+    // Avoid making the entire body horizontally scrollable when the table is too wide for the screen
+    max-width: 100%;
+    .columns {
+        overflow: hidden;
+        .col-auto {
+            max-width: 100%;
+        }
+    }
+}
+
+// Table styles for extended display mode
+.extended-display {
+    #table-holder table, #table-holder tbody, #table-holder th, #table-holder td, #table-holder tr {
+        display: block;
+        max-width: 100%;
+    }
+
+    #table-holder thead {
+        // Hide normal headers
+        display: none;
+    }
+
+    #table-holder tr {
+        border-bottom: 3px solid #ccc;
+    }
+
+    #table-holder td {
+        // Behave like a "row"
+        border: none;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+        padding: 0.3rem 0.2rem;
+        padding-left: 40%;
+        overflow: hidden;
+        word-wrap: break-word;
+        text-align: left !important;
+    }
+
+    #table-holder table td:before {
+        // Column name
+        content: attr(data-field-name);
+        font-weight: bold;
+        position: absolute;
+        top: 0.3rem ;
+        left: 0.2rem;
+        width: 40%;
+        padding-right: 2rem;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    #table-holder table td:after {
+        // Fix row height for empty string values
+        content: " ";
+        white-space: pre;
+    }
+}
