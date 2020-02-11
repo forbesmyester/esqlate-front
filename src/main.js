@@ -243,9 +243,7 @@ const viewStore = writable({
     showingSql: (window.localStorage.getItem('showingSql') === "false") ?
         false :
         true,
-    showingExtendedDisplay: (window.localStorage.getItem('showingExtendedDisplay') === "false") ?
-        false :
-        true,
+    showingExtendedDisplay: !!window.localStorage.getItem('showingExtendedDisplay')
 });
 
 getRequest("/definition")
