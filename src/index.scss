@@ -180,16 +180,48 @@ input, select, .input-popup {
         max-width: 100%;
     }
 
+    // Custom headers
     #table-holder thead {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        font-weight: bold;
+
+        tr {
+            display: flex;
+        }
+
+        tr:before, tr:after {
+            display: inline-block;
+            background-color: #dadee4;
+            padding: 0.6rem 0.4rem;
+        }
+
+        tr:before {
+            content: "Column Name";
+            width: 40%;
+            text-align: right;
+            padding-right: 2em;
+        }
+
+        tr:after {
+            content: "Value";
+            width: 60%;
+            padding-left: 0;
+        }
+
         // Hide normal headers
-        display: none;
+        th {
+            display: none;
+        }
     }
 
-    #table-holder tr {
+    #table-holder tbody tr {
         border-bottom: 3px solid #ccc;
     }
 
-    #table-holder td {
+    #table-holder tbody td {
         // Behave like a "row"
         border: none;
         border-bottom: 1px solid #ddd;
@@ -201,7 +233,7 @@ input, select, .input-popup {
         text-align: left !important;
     }
 
-    #table-holder table td:before {
+    #table-holder tbody td:before {
         // Column name
         content: attr(data-field-name);
         font-weight: bold;
@@ -214,7 +246,7 @@ input, select, .input-popup {
         text-align: right;
     }
 
-    #table-holder table td:after {
+    #table-holder tbody td:after {
         // Fix row height for empty string values
         content: " ";
         white-space: pre;
