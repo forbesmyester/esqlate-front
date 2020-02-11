@@ -2938,3 +2938,69 @@ input.is-error, select.is-error, .input-popup.is-error {
 
 .showing-menu.off-canvas .off-canvas-overlay {
   background: rgba(56, 56, 56, 0.03); }
+
+#table-holder table td {
+  vertical-align: top; }
+
+.off-canvas-content {
+  max-width: 100%; }
+  .off-canvas-content .columns {
+    overflow: hidden; }
+    .off-canvas-content .columns .col-auto {
+      max-width: 100%; }
+
+.extended-display #table-holder table, .extended-display #table-holder tbody, .extended-display #table-holder th, .extended-display #table-holder td, .extended-display #table-holder tr {
+  display: block;
+  max-width: 100%; }
+
+.extended-display #table-holder thead {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-weight: bold; }
+  .extended-display #table-holder thead tr {
+    display: flex; }
+  .extended-display #table-holder thead tr:before, .extended-display #table-holder thead tr:after {
+    display: inline-block;
+    background-color: #dadee4;
+    padding: 0.6rem 0.4rem; }
+  .extended-display #table-holder thead tr:before {
+    content: "Column Name";
+    width: 40%;
+    text-align: right;
+    padding-right: 2em; }
+  .extended-display #table-holder thead tr:after {
+    content: "Value";
+    width: 60%;
+    padding-left: 0; }
+  .extended-display #table-holder thead th {
+    display: none; }
+
+.extended-display #table-holder tbody tr {
+  border-bottom: 3px solid #ccc; }
+
+.extended-display #table-holder tbody td {
+  border: none;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+  padding: 0.3rem 0.2rem;
+  padding-left: 40%;
+  overflow: hidden;
+  word-wrap: break-word;
+  text-align: left !important; }
+
+.extended-display #table-holder tbody td:before {
+  content: attr(data-field-name);
+  font-weight: bold;
+  position: absolute;
+  top: 0.3rem;
+  left: 0.2rem;
+  width: 40%;
+  padding-right: 2rem;
+  white-space: nowrap;
+  text-align: right; }
+
+.extended-display #table-holder tbody td:after {
+  content: " ";
+  white-space: pre; }

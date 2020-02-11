@@ -231,7 +231,7 @@
                   <h3>{ $viewStore.definition.title }</h3><div id="color-finder" style="display: none"><span id="color-finder-error" class="text-error"></span>a<span id="color-finder-warning" class="text-warning">b</span><span id="color-finder-success" class="text-success">c</span></div>
                 </div>
                 <div class="column col-3">
-                <a style="text-decoration: none; float:right; font-size: 200%" href="#" on:click|preventDefault={showConfig}>⚙</a>
+                <a style="text-decoration: none; float:right; font-size: 200%" href="#close" on:click|preventDefault={showConfig}>⚙</a>
                 </div>
               </div></div>
           </div>
@@ -369,10 +369,10 @@
 
 
 <div class={ configActive ? "modal active" : "modal" }>
-  <a href="#close" class="modal-overlay" aria-label="Close" on:click|preventDefault={hideConfig}></a>
+  <a href="#close" class="modal-overlay" aria-label="Close" on:click|preventDefault={hideConfig}> </a>
   <div class="modal-container">
     <div class="modal-header">
-      <a href="#close" class="btn btn-clear float-right" aria-label="Close" on:click|preventDefault={hideConfig}></a>
+      <a href="#close" class="btn btn-clear float-right" aria-label="Close" on:click|preventDefault={hideConfig}> </a>
       <div class="modal-title h5">Display Configuration</div>
     </div>
     <div class="modal-body">
