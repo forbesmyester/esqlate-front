@@ -39,7 +39,8 @@
       (field.type.indexOf("text") > -1) ||
       (field.type.indexOf("char") > -1) ||
       (field.type.indexOf("date") > -1) ||
-      (field.type.indexOf("time") > -1)
+      (field.type.indexOf("time") > -1) ||
+      (field.type.indexOf("jsonb") > -1)
     ) {
       return "left";
     }
@@ -127,7 +128,7 @@
           {#each result.rows || [] as row}
           <tr>
             {#each row as cell, i}
-            <td style={ "text-align: " + alignment(result.fields[i]) }>
+            <td style={ "text-align: " + alignment(result.fields[i]) } data-field-name={ result.fields[i].name }>
               {#if cell === null}
               NULL
               {:else if getFormatter(result.fields[i].type)}
