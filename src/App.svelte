@@ -38,6 +38,10 @@
   function showSidebar() { sidebarActive = true; }
   function hideSidebar() { sidebarActive = false; }
 
+  let configActive = false
+  function showConfig() { configActive = true; }
+  function hideConfig() { configActive = false; }
+
   function resetStylesheet(name) {
 
     let styleEl = document.getElementById(name);
@@ -227,14 +231,7 @@
                   <h3>{ $viewStore.definition.title }</h3><div id="color-finder" style="display: none"><span id="color-finder-error" class="text-error"></span>a<span id="color-finder-warning" class="text-warning">b</span><span id="color-finder-success" class="text-success">c</span></div>
                 </div>
                 <div class="column col-3">
-                  <label class="form-switch" style="float: right">
-                    <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
-                    SQL<i class="form-icon"></i>
-                  </label>
-                  <label class="form-switch" style="float: right">
-                    <input type="checkbox" checked={$viewStore.showingExtendedDisplay ? "checked" : ""} on:click={toggleShowingExtendedDisplay}>
-                    Extended Display<i class="form-icon"></i>
-                  </label>
+                <a style="text-decoration: none; float:right; font-size: 200%" href="#" on:click|preventDefault={showConfig}>⚙</a>
                 </div>
               </div></div>
           </div>
@@ -367,5 +364,36 @@
 <div class={$viewStore.loading ? "modal active" : "modal"} id="loading-modal"> 
   <div id="loading-modal-content">
     🕓
+  </div>
+</div>
+
+
+<div class={ configActive ? "modal active" : "modal" }>
+  <a href="#close" class="modal-overlay" aria-label="Close" on:click|preventDefault={hideConfig}></a>
+  <div class="modal-container">
+    <div class="modal-header">
+      <a href="#close" class="btn btn-clear float-right" aria-label="Close" on:click|preventDefault={hideConfig}></a>
+      <div class="modal-title h5">Display Configuration</div>
+    </div>
+    <div class="modal-body">
+      <div class="content">
+        <div class="container">
+          <div class="columns">
+            <div class="column col-12">
+              <label class="form-switch">
+                <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
+                <i class="form-icon"></i>SQL
+              </label>
+            </div>
+            <div class="column col-12">
+              <label class="form-switch">
+                <input type="checkbox" checked={$viewStore.showingExtendedDisplay ? "checked" : ""} on:click={toggleShowingExtendedDisplay}>
+                <i class="form-icon"></i>Extended Display
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
