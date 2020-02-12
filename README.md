@@ -31,6 +31,7 @@ Once this is complete you can visit http://localhost:[LISTEN_PORT]/ to use eSQLa
 
 Thank you
 
+ * @richrd - Support for showing results in Extended Display mode
  * @richrd - Support for displaying JSONB #1
 
 ## Credits
