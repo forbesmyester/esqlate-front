@@ -382,13 +382,13 @@
             <div class="column col-12">
               <label class="form-switch">
                 <input type="checkbox" checked={$viewStore.showingSql ? "checked" : ""} on:click={toggleShowingSql}>
-                <i class="form-icon"></i>SQL
+                <i class="form-icon"></i>SQL - Show the detail of the SQL to be executed (instead of just the field names / values).
               </label>
             </div>
             <div class="column col-12">
               <label class="form-switch">
                 <input type="checkbox" checked={$viewStore.showingExtendedDisplay ? "checked" : ""} on:click={toggleShowingExtendedDisplay}>
-                <i class="form-icon"></i>Extended Display
+                <i class="form-icon"></i>Extended Display - Display result set as one row per field, useful for really wide result sets.
               </label>
             </div>
           </div>
