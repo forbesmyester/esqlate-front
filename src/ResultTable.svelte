@@ -168,7 +168,7 @@
         </div>
       {:else}
         <div class="toast toast-success toast-resultset-warning">
-          All the results are showing but you can sitill <a href="#show-downloads" on:click|preventDefault={showDownloads}>download the results</a>.
+          All the results are showing but you can still <a href="#show-downloads" on:click|preventDefault={showDownloads}>download the results</a>.
         </div>
       {/if}
     </div>
