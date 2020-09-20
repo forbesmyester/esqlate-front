@@ -278,7 +278,7 @@
                 </div>
                 <div class="column col-7 col-sm-12">
                   {#if parameter.type == "static"}
-                  <label class="form-label" >
+                  <label class="form-label" for={ "input-" + parameter.name }>
                   <Parameter on:newvalue={onnewcontrolvalue} onfix={onfix} onerror={onerror} onfocus={onfocus} onblur={onblur} popup={popup} bind:control={$viewStore.controls[parameter.name]} parameter={parameter}/>
                   </label>
                   {:else}

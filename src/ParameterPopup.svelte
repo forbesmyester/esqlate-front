@@ -19,7 +19,7 @@ if (!parameter.empty_string_is_null) {
 
 </script>
 <strong>
-  <button data-parameter-name={parameter.name} class="input-popup" on:click={() => popup(parameter.name)}>
+  <button id={ "input-" + parameter.name } data-parameter-name={parameter.name} class="input-popup" on:click={() => popup(parameter.name)}>
     <div>{getDisplayValue(control.value)}</div>&nbsp;⯅
   </button>
 </strong>
