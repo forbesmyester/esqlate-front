@@ -21,7 +21,7 @@ export function getFullUrlFromResponseUrl(apiRoot: URL, responseUrl: string) {
     }
 
     // Or something else...
-    throw new Error("Cannot handle location " + responseUrl);
+    throw new Error("Cannot handle location for: " + responseUrl);
 
 }
 
