@@ -8,6 +8,7 @@ import { getApiRoot, getURLSearchParams, getRequest, postRequest } from "./io";
 import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
 import { pick as runPick, getPopupLinkCreator } from "./user-actions";
+import { getLocalStorage } from "./storage";
 
 
 function popup(row) {
@@ -89,7 +90,7 @@ function run() {
 function toggleShowingSql() {
     viewStore.update((vs) => {
         const value = !vs.showingSql;
-        window.localStorage.setItem('showingSql', value);
+        getLocalStorage().setItem('showingSql', value);
         return {...vs, showingSql: value }
     });
 }
@@ -98,7 +99,7 @@ function toggleShowingSql() {
 function toggleShowingExtendedDisplay() {
     viewStore.update((vs) => {
         const value = !vs.showingExtendedDisplay;
-        window.localStorage.setItem('showingExtendedDisplay', value);
+        getLocalStorage().setItem('showingExtendedDisplay', value);
         return {...vs, showingExtendedDisplay: value }
     });
 }
@@ -240,10 +241,10 @@ function setLoading(ctx) {
 
 const viewStore = writable({
     ...getInitialViewStore(),
-    showingSql: (window.localStorage.getItem('showingSql') === "false") ?
+    showingSql: (getLocalStorage().getItem('showingSql') === "false") ?
         false :
         true,
-    showingExtendedDisplay: (window.localStorage.getItem('showingExtendedDisplay') === "true") ?
+    showingExtendedDisplay: (getLocalStorage().getItem('showingExtendedDisplay') === "true") ?
         true :
         false,
 });
