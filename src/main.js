@@ -9,7 +9,7 @@ import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
 import { pick as runPick, getPopupLinkCreator } from "./user-actions";
 import { getLocalStorage } from "./storage";
-
+import { consoleLog } from "./console-log"
 
 function popup(row) {
     const runPopup = getPopupLinkCreator(getURLSearchParams);
@@ -217,7 +217,7 @@ function setPopupMode(ctx) {
 }
 
 function errorHandler(error) {
-    console.log(error);
+    consoleLog(error);
     let message = error;
     if (error.message) {
         message = error.message;
@@ -279,7 +279,7 @@ const app = new App({
 var routes = {
     '/': promiseChain(errorHandler, [
         ([definitionName]) => {
-            console.log("ROUTE:", '/', window.location);
+            consoleLog("ROUTE:", '/', window.location);
             viewStore.update((vs) => ({...vs, showingMenu: true }));
             return Promise.resolve({ params: { definitionName } });
         }
@@ -287,7 +287,7 @@ var routes = {
     '/:definitionName': promiseChain(errorHandler, [
         setLoading,
         ([definitionName]) => {
-            console.log("ROUTE:", '/:definitionName', [definitionName], window.location);
+            consoleLog("ROUTE:", '/:definitionName', [definitionName], window.location);
             return Promise.resolve({ params: { definitionName } });
         },
         hideResults,
@@ -300,7 +300,7 @@ var routes = {
     '/:definitionName/request': promiseChain(errorHandler, [
         setLoading,
         ([definitionName]) => {
-            console.log("ROUTE:", '/:definitionName/request', [definitionName], window.location);
+            consoleLog("ROUTE:", '/:definitionName/request', [definitionName], window.location);
             return Promise.resolve({ params: { definitionName } });
         },
         hideResults,
@@ -313,7 +313,7 @@ var routes = {
     '/:definitionName/request/:requestLocation': promiseChain(errorHandler, [
         setLoading,
         ([definitionName, requestLocation]) => {
-            console.log("ROUTE:", '/:definitionName/request/:requestLocation', [definitionName, requestLocation], window.location);
+            consoleLog("ROUTE:", '/:definitionName/request/:requestLocation', [definitionName, requestLocation], window.location);
             return Promise.resolve({
                 params: {
                     definitionName,
@@ -330,7 +330,7 @@ var routes = {
     ]),
     '/:definitionName/:resultOrDownload/:resultLocation': promiseChain(errorHandler, [
         ([definitionName, resultOrDownload, requestLocation]) => {
-            console.log("ROUTE:", '/:definitionName/result/:resultLocation', [definitionName, requestLocation], window.location);
+            consoleLog("ROUTE:", '/:definitionName/result/:resultLocation', [definitionName, requestLocation], window.location);
             if (resultOrDownload == "result") {
                 setLoading();
             }
