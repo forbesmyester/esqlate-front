@@ -17,6 +17,8 @@
 
   function syncTable() {
 
+    if (!document.getElementById(id + "-style")) { return; }
+
     function resetStylesheet() {
       const stylesheet = document.getElementById(id + "-style").sheet;
       for (let i = 0; i < stylesheet.rules.length; i++) {

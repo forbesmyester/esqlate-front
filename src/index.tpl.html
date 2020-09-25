@@ -16,14 +16,21 @@
 
 <body data-api-server="${API_SERVER}" class="container" style="overflow-x: auto">
 </body>
-<script defer src='./bundle.js'></script>
 <script>
 function esqlateHideToastError() {
+  if (!document.getElementById("toast-error-wrapper")) {
+    return;
+  }
   document.getElementById("toast-error-wrapper").style.display="none";
 }
 function esqlateShowToastError(msg) {
+  if (!document.getElementById("toast-error-wrapper")) {
+    alert(msg);
+    return;
+  }
   document.getElementById("toast-error-wrapper").style.display="flex";
   document.getElementById("toast-error-wrapper-text").innerText = msg;
 }
 </script>
+<script defer src='./bundle.js'></script>
 </html>
