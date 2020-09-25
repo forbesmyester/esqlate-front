@@ -33,7 +33,8 @@ export function getRequest(apiUrl: URL): Promise<Response> {
         headers: { "x-no-redirect": "1", "Content-Type": "application/json" },
     };
     return fetch(url, opts)
-        .then(throwOnInvalidStatusCodes.bind(null, apiUrl));
+        .then(throwOnInvalidStatusCodes.bind(null, apiUrl))
+        .then((r) => r.json() as unknown) as Promise<X>;
 }
 
 export function postRequest(apiUrl: URL, data: any) {
@@ -46,7 +47,8 @@ export function postRequest(apiUrl: URL, data: any) {
         body: JSON.stringify(data)
     };
     return fetch(url, opts)
-        .then(throwOnInvalidStatusCodes.bind(null, apiUrl));
+        .then(throwOnInvalidStatusCodes.bind(null, apiUrl))
+        .then((r) => r.json() as unknown) as Promise<X>;
 }
 
 export function errorHandler(e: Error) {

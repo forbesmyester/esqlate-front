@@ -48,17 +48,12 @@ export function getInitialViewStore(): ViewStore {
 
 
 export async function loadDefinitionHTTP(definitionName: EsqlateDefinition["name"]): Promise<EsqlateDefinition> {
-
-    const url = `/definition/${definitionName}`;
-    const resp = await getRequest(url);
-    return await resp.json();
+    return await getRequest(`/definition/${definitionName}`);
 }
 
 export async function resultDemandHTTP(definitionName: EsqlateDefinition["name"]): Promise<EsqlateResult> {
     const data: EsqlateRequestCreation = { "arguments": [] };
-    const url = `/demand/${definitionName}`;
-    return postRequest(url, data)
-        .then(resp => resp.json());
+    return postRequest(`/demand/${definitionName}`, data);
 }
 
 

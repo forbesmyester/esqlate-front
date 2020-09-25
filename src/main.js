@@ -136,7 +136,6 @@ function createRequest(ctx) {
 
     // TODO: Catch 422 etc
     return postRequest(url, data)
-        .then(resp => resp.json())
         .then((json) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${query}`;
             router.setRoute(url);
@@ -149,7 +148,6 @@ function waitForRequest(ctx) {
 
     function getReady() {
         return getRequest(ctx.params.requestLocation)
-            .then(resp => resp.json())
             .then((j) => {
                 if ((j.status == "preview") || (j.status == "complete")) {
                     return { complete: true, value: j.location };
@@ -178,8 +176,7 @@ function waitForRequest(ctx) {
 function loadResults(ctx) {
 
     async function fetcher() {
-        const resp = await getRequest(ctx.params.resultLocation);
-        return await resp.json();
+        return await getRequest(ctx.params.resultLocation);
     }
 
     const desiredStatus = ctx.params.showingDownload ?
@@ -250,9 +247,7 @@ const viewStore = writable({
 });
 
 getRequest("/definition")
-    .then(resp => resp.json())
     .then((menu) => viewStore.update((vs) => ({...vs, menu })));
-
 
 const cacheDefinition = getCache(loadDefinitionHTTP);
 const cacheCompleteResultForSelect = getCache(resultDemandHTTP);
