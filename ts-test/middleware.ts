@@ -1,7 +1,7 @@
 import { getRequest, postRequest, errorHandler } from "../ts-src/io";
 import getCache from "esqlate-cache";
 import { getControlStore, urlSearchParamsToArguments } from "../ts-src/controls";
-import { get as getStoreValue, writable, Writable } from 'svelte/store';
+import { get as getStoreValue, writable, Writable, get } from 'svelte/store';
 import { EsqlateStatementNormalized, newlineBreak, html, normalize, EsqlateDefinition, EsqlateStatement, EsqlateResult, EsqlateSuccessResult } from "esqlate-lib";
 import { EsqlateQueryComponent } from "../ts-src/types";
 
@@ -78,11 +78,11 @@ test('getLoadDefinition - simplist', (assert) => {
         .then(initializeControls)
         .then((_ctx) => {
             assert.is(
-                (getStoreValue(viewStore).definition as EsqlateDefinition).name,
+                ((get(viewStore) as ViewStore).definition as EsqlateDefinition).name,
                 "customer_search"
             );
             assert.is(
-                (getStoreValue(viewStore).statement as EsqlateStatementNormalized[]).length,
+                ((get(viewStore) as ViewStore).statement as EsqlateStatementNormalized[]).length,
                 5
             );
             assert.deepEqual(
@@ -94,7 +94,7 @@ test('getLoadDefinition - simplist', (assert) => {
                 ["customer_country_count"]
             );
             assert.deepEqual(
-                (getStoreValue(viewStore).controls),
+                ((get(viewStore) as ViewStore).controls),
                 {
                     search_string: { value: "Rob" },
                     country: {

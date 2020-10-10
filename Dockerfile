@@ -17,4 +17,4 @@ COPY ts-test ./ts-test
 COPY ts-src ./ts-src
 COPY src ./src
 
-CMD mkdir -p public && npm run-script && npm run-script build && npm run-script start
+CMD mkdir -p public && npm run-script build && npm run-script start
