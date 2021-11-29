@@ -25,7 +25,7 @@ function esqlateHideToastError() {
 }
 function esqlateShowToastError(msg) {
   if (!document.getElementById("toast-error-wrapper")) {
-    alert(msg);
+    alert("NO ERROR WRAPPER: " + msg);
     return;
   }
   document.getElementById("toast-error-wrapper").style.display="flex";

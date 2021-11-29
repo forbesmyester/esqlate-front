@@ -3,13 +3,16 @@ import App from './App.svelte';
 import { waitFor } from 'esqlate-waitfor';
 import { getInitialViewStore, loadResults as loadResultsImpl, resultDemandHTTP, loadDefinitionHTTP, getInitilizeControls, getLoadDefinition } from "./middleware";
 import { addControlStoreToEsqlateQueryComponents, popBackFromArguments, serializeValues, queryComponentsToArguments, urlSearchParamsToArguments } from "./controls";
+import { runningInWvLinewise } from "./js-wrap-wv-linewise-js-lib"
 import { getFullUrlFromResponseUrl } from "./getFullUrlFromResponseUrl";
-import { getApiRoot, getURLSearchParams, getRequest, postRequest } from "./io";
+import { consoleLog, getApiRoot, getURLSearchParams, getRequest, postRequest,errorHandler } from "./io";
 import getCache from "esqlate-cache";
 import promiseChain from "./promiseChain";
 import { pick as runPick, getPopupLinkCreator } from "./user-actions";
 import { getLocalStorage } from "./storage";
-import { consoleLog } from "./console-log"
+
+window.onerror = errorHandler;
+window.onunhandledrejection = errorHandler;
 
 function popup(row) {
     const runPopup = getPopupLinkCreator(getURLSearchParams);
@@ -34,6 +37,15 @@ function download(mimeType) {
     );
     if (otherFormat.length == 0) {
         throw Error(`Mime type ${mimeType} was requested but not found`);
+    }
+    if (runningInWvLinewise()) {
+        getRequest(otherFormat[0].location)
+            .catch((err) => {
+                console.log(err);
+            });
+        consoleLog("Opening in default viewer");
+        alert("Opening in default viewer");
+        return;
     }
     window.location = getFullUrlFromResponseUrl(getApiRoot(), otherFormat[0].location);
 }
@@ -213,16 +225,6 @@ function setPopupMode(ctx) {
     return Promise.resolve(ctx);
 }
 
-function errorHandler(error) {
-    consoleLog(error);
-    let message = error;
-    if (error.message) {
-        message = error.message;
-    }
-    document.getElementById("loading-modal").classList.remove("active");
-    esqlateShowToastError(message);
-}
-
 function finishedLoading(ctx) {
     viewStore.update((vs) => {
         return {...vs, loading: false}
@@ -246,12 +248,11 @@ const viewStore = writable({
         false,
 });
 
-getRequest("/definition")
-    .then((menu) => viewStore.update((vs) => ({...vs, menu })));
-
 const cacheDefinition = getCache(loadDefinitionHTTP);
 const cacheCompleteResultForSelect = getCache(resultDemandHTTP);
 
+getRequest("/definition")
+    .then((menu) => viewStore.update((vs) => ({...vs, menu })))
 
 const app = new App({
 	target: document.body,
@@ -274,7 +275,7 @@ const app = new App({
 var routes = {
     '/': promiseChain(errorHandler, [
         ([definitionName]) => {
-            consoleLog("ROUTE:", '/', window.location);
+            consoleLog(`ROUTE: / (${window.location.hash})`);
             viewStore.update((vs) => ({...vs, showingMenu: true }));
             return Promise.resolve({ params: { definitionName } });
         }
@@ -282,7 +283,7 @@ var routes = {
     '/:definitionName': promiseChain(errorHandler, [
         setLoading,
         ([definitionName]) => {
-            consoleLog("ROUTE:", '/:definitionName', [definitionName], window.location);
+            consoleLog(`ROUTE: /:definitionName (${window.location.hash})`);
             return Promise.resolve({ params: { definitionName } });
         },
         hideResults,
@@ -295,7 +296,7 @@ var routes = {
     '/:definitionName/request': promiseChain(errorHandler, [
         setLoading,
         ([definitionName]) => {
-            consoleLog("ROUTE:", '/:definitionName/request', [definitionName], window.location);
+            consoleLog(`ROUTE: /:definitionName/request (${window.location.hash})`);
             return Promise.resolve({ params: { definitionName } });
         },
         hideResults,
@@ -308,7 +309,7 @@ var routes = {
     '/:definitionName/request/:requestLocation': promiseChain(errorHandler, [
         setLoading,
         ([definitionName, requestLocation]) => {
-            consoleLog("ROUTE:", '/:definitionName/request/:requestLocation', [definitionName, requestLocation], window.location);
+            consoleLog(`ROUTE: /:definitionName/request/:requestLocation (${window.location.hash})`);
             return Promise.resolve({
                 params: {
                     definitionName,
@@ -325,7 +326,7 @@ var routes = {
     ]),
     '/:definitionName/:resultOrDownload/:resultLocation': promiseChain(errorHandler, [
         ([definitionName, resultOrDownload, requestLocation]) => {
-            consoleLog("ROUTE:", '/:definitionName/result/:resultLocation', [definitionName, requestLocation], window.location);
+            consoleLog(`ROUTE: /:definitionName/result/:resultLocation (${window.location.hash})`);
             if (resultOrDownload == "result") {
                 setLoading();
             }
@@ -366,5 +367,4 @@ router.configure({
 router.init();
 
 
-window.onerror = errorHandler;
 export default app;

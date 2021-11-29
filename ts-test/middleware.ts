@@ -1,4 +1,4 @@
-import { getRequest, postRequest, errorHandler } from "../ts-src/io";
+import { getRequest, postRequest } from "../ts-src/io";
 import getCache from "esqlate-cache";
 import { getControlStore, urlSearchParamsToArguments } from "../ts-src/controls";
 import { get as getStoreValue, writable, Writable } from 'svelte/store';

@@ -196,6 +196,16 @@
     {#if $viewStore.showingMenu}
       <div class="columns">
         <div class="column col-auto" style="margin: 3rem auto 0 auto; max-width: 40%">
+          <div class="columns" id="toast-error-wrapper" style="display:none">
+            <div class="column col-auto" style="margin: 3rem auto 3rem auto">
+              <div class="toast toast-error">
+                <button class="btn btn-clear float-right" onclick="esqlateHideToastError()"></button>
+                <div id="toast-error-wrapper-text" style="padding: 1em">
+                  xx
+                </div>
+              </div>
+            </div>
+          </div>
           <h2>Welcome to eSQLate.</h2>
           <p>This tool enables you to create simple administration panels by writing SQL queries within a simple JSON document.</p>
         </div>
