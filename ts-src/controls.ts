@@ -96,9 +96,9 @@ export function getControlStore(
         });
     }
 
-    function selectSetValue(value: ControlStoreSelectValue["value"], options: ControlStoreSelectValue["options"]): ControlStoreSelectValue["value"] {
+    function selectSetValue(value: ControlStoreSelectValue["value"], options: ControlStoreSelectValue["options"], allowEmptyValue: boolean): ControlStoreSelectValue["value"] {
         if (options.some((op) => op.value == value)) { return value; }
-        if (options.length) { return options[0].value; }
+        if (options.length && !allowEmptyValue) { return options[0].value; }
         return "";
     }
 
@@ -113,7 +113,7 @@ export function getControlStore(
             return {...acc,
                 [item.name]: {
                     options,
-                    value: selectSetValue(value, options)
+                    value: selectSetValue(value, options, !!item.empty_string_is_null)
                 }
             }
         }
