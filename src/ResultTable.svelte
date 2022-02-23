@@ -96,24 +96,24 @@
   afterUpdate(syncTable);
   window.onresize = debounce(syncTable, 200);
 </script>
-<style>
-  #table-holder {
-    max-height: 400px;
-    overflow-y: scroll;
-  }
-  #table-holder table th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: #dadee4;
-  }
-</style>
 <div id={id}>
   <style id={ id + "-style" }>
   </style>
   {#if result && ((result.status == "complete") || (result.status == "preview"))}
   <div class="columns">
     <div class="column col-auto" style="margin: 0 auto">
+      <style>
+        #table-holder {
+          max-height: 400px;
+          overflow-y: scroll;
+        }
+        #table-holder table th {
+          position: sticky;
+          top: 0;
+          z-index: 2;
+          background-color: #dadee4;
+        }
+      </style>
       <div id="table-holder">
       <table class="results-head table table-striped table-hover" style="padding-bottom: 0; margin: 0">
         <thead>
