@@ -1,6 +1,6 @@
 {
   "name": "esqlate-front",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "SQL based functional CRUD",
   "dependencies": {
     "@types/tape": "^4.13.2",
