@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build-third-party": "mkdir -p public/node_modules && tar -C node_modules -c director/build/director.js markdown-it/dist/markdown-it.min.js | tar -C public/node_modules/ -x",
-    "test": "set -e; for FILE in ts-test/*; do ./node_modules/.bin/ts-node \"$FILE\"; done",
+    "test": "set -e; for FILE in ./ts-build/ts-test/*; do node \"$FILE\"; done",
     "build-ts": "./node_modules/.bin/tsc && cp -R ts-build/ts-src/* src/",
     "build-web": "npm run-script build-templates && npm run-script build-scss && npm run-script build-ts && npm run-script build-third-party && ./node_modules/.bin/rollup -c",
     "build": "npm run-script build-web && node build-inline.js",
