@@ -23,7 +23,7 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@types/tape": "^4.13.2",
     "es6-promise": "^4.2.8",
-    "inline-assets": "^1.4.8",
+    "inline-assets": "^1.2.4",
     "node-sass": "^7.0.1",
     "rollup": "^2.3.4",
     "rollup-plugin-commonjs": "^10.1.0",
