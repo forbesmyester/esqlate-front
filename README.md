@@ -8,8 +8,8 @@ First install and configure [eSQLate Server](https://github.com/forbesmyester/es
 
 Then you must set up the following environmental variables:
 
- * `LISTEN_PORT`
- * `API_SERVER`
+ * `LISTEN_PORT` - The port number you wish eSQLate Front to listen on.
+ * `API_SERVER` - The HTTP root of the [eSQLate Server](https://github.com/forbesmyester/esqlate-server). NOTE: should not include final `/`. It is probably something like `http://localhost:8803`.
 
 Install the OS dependencies:
 

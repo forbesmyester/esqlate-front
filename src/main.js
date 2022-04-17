@@ -17,7 +17,18 @@ window.onunhandledrejection = errorHandler;
 function popup(row) {
     const runPopup = getPopupLinkCreator(getURLSearchParams);
     const route = runPopup(row, getStoreValue(viewStore).definition, getStoreValue(viewStore).controls);
-    router.setRoute(route);
+    routerSetRoute(route);
+}
+
+/**
+ * MS Edge CANNOT change location.hash on the about:blank page (where we really
+ * are in WvLinewise. So the work-around is to create a link and click on it...
+ */
+function routerSetRoute(route) {
+    let ahref = document.createElement("a");
+    ahref.href = "#" + route.replace(/^#+/, "");
+    ahref.click();           // Do this...
+    // router.handler();     // Not this...
 }
 
 function pick(row) {
@@ -28,7 +39,7 @@ function pick(row) {
         ),
         getStoreValue(viewStore).result.fields
     );
-    router.setRoute(route);
+    routerSetRoute(route);
 }
 
 function download(mimeType) {
@@ -52,7 +63,7 @@ function download(mimeType) {
 
 
 function cancelDownload() {
-    router.setRoute(
+    routerSetRoute(
         window.location.hash.replace(
             /^#\/?([^\/]+)\/((result)|(download))/,
             "/$1/result"
@@ -61,7 +72,7 @@ function cancelDownload() {
 }
 
 function showDownloads() {
-    router.setRoute(
+    routerSetRoute(
         window.location.hash.replace(
             /^#\/?([^\/]+)\/((result)|(download))/,
             "/$1/download"
@@ -76,11 +87,11 @@ function empty() {
         getStoreValue(viewStore).result.fields,
         true
     );
-    router.setRoute(route);
+    routerSetRoute(route);
 }
 
 function cancel() {
-    router.setRoute(popBackFromArguments(
+    routerSetRoute(popBackFromArguments(
         urlSearchParamsToArguments(getURLSearchParams())
     ).url);
 }
@@ -95,7 +106,7 @@ function run() {
         )
     );
     const route = `/${encodeURIComponent(definitionName)}/request?${qs}`
-    router.setRoute(route);
+    routerSetRoute(route);
 }
 
 
@@ -150,7 +161,7 @@ function createRequest(ctx) {
     return postRequest(url, data)
         .then((json) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/request/${encodeURIComponent(json.location)}?${query}`;
-            router.setRoute(url);
+            routerSetRoute(url);
             return ctx;
         });
 }
@@ -178,7 +189,7 @@ function waitForRequest(ctx) {
     return waitFor(getReady, calculateNewDelay)
         .then((loc) => {
             const url = `/${encodeURIComponent(ctx.params.definitionName)}/result/${encodeURIComponent(loc)}?${serializeValues(qry)}`;
-            router.setRoute(url);
+            routerSetRoute(url);
             return ctx;
         });
 
@@ -361,7 +372,7 @@ let router;
 router = window.Router(routes);
 router.configure({
     notfound: (_r) => {
-        router.setRoute("/");
+        routerSetRoute("/");
     },
 });
 router.init();

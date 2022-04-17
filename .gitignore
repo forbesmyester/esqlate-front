@@ -15,3 +15,8 @@
 /env.ndjson
 /src/storage.js
 /src/console-log.js
+/public/bundle.js /public/bundle.js.map
+/src/js-wrap-wv-linewise-js-lib.js
+/index.html
+public/bundle.js
+public/bundle.js.map

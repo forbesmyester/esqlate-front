@@ -29,8 +29,9 @@ export interface ControlStore {
 export function urlSearchParamsToArguments(url: URLSearchParams): EsqlateQueryComponent[] {
 
     let o = [];
-    for (let [k, v] of url.entries()) {
-        o.push({ name: k, val: v});
+    let ar = Array.from(((url as any).entries()) as Array<[EsqlateQueryComponent["name"], EsqlateQueryComponent["val"]]>);
+    for (let [k, v] of ar) {
+        o.push({ name: k, val: v });
     }
     return o;
 
