@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Document versions
+      run: echo "NPM:" && npm --version && echo "NodeJS:" && node --version
     - name: NPM Install
       run: npm install
     - name: Build
